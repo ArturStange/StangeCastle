@@ -199,6 +199,7 @@ header {
     border-radius: 10px;
     text-decoration: none;
     transition: 0.3s;
+    font-size: 2vw;
 }
 
 .btn:hover {
