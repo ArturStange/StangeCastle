@@ -112,9 +112,9 @@ IA             → O Conselheiro (LLM Local + SLM intermediário + RAG)
 
 ## 🗺️ Roadmap
 
-- [ ] Estrutura base da aplicação (ASP.NET Core)
+- [x] Estrutura base da aplicação (ASP.NET Core)
+- [x] Portfólio Público
 - [ ] Módulo de Autenticação com RBAC
-- [ ] Portfólio Público
 - [ ] StangeTreasury — Drive Pessoal
 - [ ] StangeLibrary — CMS de TTRPG com editor rico
 - [ ] O Conselheiro — Integração com LLM Local
