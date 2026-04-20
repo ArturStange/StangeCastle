@@ -1,4 +1,6 @@
 ﻿@RenderBody()
+@using Microsoft.AspNetCore.Identity
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,13 +16,31 @@
     <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
 </head>
 <body>
+    <div class="auth-menu">
+            @if (User.Identity != null && User.Identity.IsAuthenticated){
+                <span class="auth-nome pixelify-sans">
+                    Bem-vindo, @User.Identity.Name!
+                </span>
+                <form asp-controller="Auth" asp-action="Logout" method="post" class="auth-form">
+                    <button type="submit" class="auth-btn pixelify-sans">
+                        Sair
+                    </button>
+                </form>
+            }
+            else {
+                <a asp-controller="Auth" asp-action="Login" class="auth-btn pixelify-sans"> Entrar </a>
+                <a asp-controller="Auth" asp-action="Register" class="auth-btn pixelify-sans"> Cadastrar </a>
+            }
+    </div>
+    
     <nav class="navbar">
         <ul>
             <li><a href="#projetos">Projetos</a></li>
             <li><a href="#sobre">Sobre</a></li>
             <li><a href="#contato">Contato</a></li>
-            <li><a href="pindomara.html">Pindomara_Server</a></li>
-            <li><a href="mythosrpg.html">Mythos_RPG</a></li>
+            <li><a href="mythosrpg.cshtml">Mythos RPG</a></li>
+            <li><a href="pindomaraserver.html">Pindomara Server</a></li>
+            <li><a href="talos.html">Fale com Talos</a></li>
         </ul>
     </nav>
 
@@ -34,7 +54,7 @@
     </nav>
 
     <footer>
-        <p style="font-size: 2vw;">© 2025 StangeCastle.inc</p>
+        <p style="font-size: 2vw;">© 2026 StangeCastle.inc</p>
     </footer>
 </body>
 </html>

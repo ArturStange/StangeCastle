@@ -1,8 +1,12 @@
 :root {
     --vinho: #7A0831;
+    --vinho-transparente: rgba(122, 8, 49, 0.4);
+    --vinho-escuro: rgba(163, 59, 255, 0.15);
+    --vinho-leve: rgba(150, 18, 66, 0.9);
     --roxo-neon: #A33BFF;
     --lilas: #C07BFF;
     --ciano: #3DF2FF;
+    --ciano-escuro: rgba(61, 242, 255, 0.2);
     --offwhite: #F5E8FF;
     --preto: #000000;
 }
@@ -29,50 +33,68 @@ body {
 }
 
 .img-logo{
+    margin-top: 125px;
     width: 100%;
     min-height: 220px;
     object-fit: auto;
     border-radius: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .navbar {
     position: fixed;
-    top: 0;
-    width: 100%;
-    height:15px;
-    min-height:110px;
-    backdrop-filter: blur(10px);
-    background: rgba(122,8,49,0.6);
+    top: 10px; 
+    left: 50%;
+    transform: translateX(-50%); 
+    width: auto; 
+    padding: 10px 30px; 
+    min-height: auto;
+    backdrop-filter: blur(8px);
+    background: var(--vinho-transparente); 
+    border: 5px solid cyan; 
+    border-radius: 0; 
     display: flex;
-    justify-content:center;
+    justify-content: center;
     align-items: center;
-    box-shadow: 0 0 15px rgba(61, 242, 255, 0.3);
+    gap: 20px; 
+    box-shadow: 0 0 15px var(--ciano);
     z-index: 1000;
-    font-size: 3vw;
 }
 
 .navbar .logo {
-    font-weight: 400;
-    font-size: 3vw;
+    font-weight: 700;
+    font-size: 1.2rem; 
     color: var(--ciano);
+    white-space: nowrap;
+    margin-right: 20px;
+    margin: 0;
+    line-height: 1;
 }
 
 .navbar ul {
     list-style: none;
     display: flex;
-    gap: 30px;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    align-items: center;
 }
 
 .navbar a {
+    font-size: 1.6rem;
     color: var(--lilas);
     text-decoration: none;
     transition: 0.2s;
+    white-space: nowrap;
+    line-height: 1;
 }
 
 .navbar a:hover {
     color: cyan;
     text-shadow: 0 0 8px cyan;
-    transform: scale(1.15);
+    transform: scale(1.1);
 }
 
 .navbar li {
@@ -81,6 +103,55 @@ body {
 
 .navbar li:hover {
     transform: translateY(-4px);
+}
+
+.auth-menu {
+    position: fixed;
+    top: 85px;
+    right: 110px;
+    z-index: 1001;
+    background: var(--vinho-transparente);
+    padding: 4px 10px;
+    border-radius: 0 0 8px 8px; 
+    backdrop-filter: blur(5px);
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    font-size: 1.2rem;
+    border: 2px solid cyan;
+    border-top: none;
+}
+
+.auth-menu .auth-form {
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.auth-menu .auth-btn {
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 1.2rem; /* Tamanho um pouco menor que a navbar principal */
+    color: var(--lilas);
+    text-decoration: none;
+    background: transparent; /* Tira o fundo cinza do botão */
+    border: none; /* Tira a borda padrão do botão */
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.auth-menu .auth-btn:hover {
+    color: cyan;
+    text-shadow: 0 0 8px cyan;
+    transform: scale(1.1);
+}
+
+.auth-menu .auth-nome {
+    font-size: 0.9rem; /* Fica bem pequeno e discreto */
+    color: var(--ciano); /* Ciano para contrastar com os botões lilás */
+    white-space: nowrap;
+    letter-spacing: 1px;
 }
 
 /* HEADER */
@@ -174,18 +245,19 @@ header {
 }
 
 .card {
-    background: rgba(163, 59, 255, 0.15);
+    background: var(--vinho-leve);
     border: 10px solid var(--roxo-neon);
     padding: 25px;
     min-height: 220px;
-    box-shadow: 0 0 20px rgba(61, 242, 255, 0.2);
+    box-shadow: 0 0 20px var(--ciano);
     transition: 0.3s;
     font-family: "Pixelify Sans", sans-serif;
+    color: var(--offwhite);
 }
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 0 25px rgba(61, 242, 255, 0.35);
+    box-shadow: 0 0 25px var(--ciano);
 }
 
 /* BOTÃO */
@@ -196,7 +268,7 @@ header {
     font-weight: bold;
     background: var(--roxo-neon);
     color: var(--preto);
-    border-radius: 10px;
+    border-radius: 0px;
     text-decoration: none;
     transition: 0.3s;
     font-size: 2vw;
@@ -213,11 +285,11 @@ header {
     left: 0;
     width: 100%;
     backdrop-filter: blur(10px);
-    background: rgba(122, 8, 49, 0.6);
+    background: var(--vinho-escuro);
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 0 15px rgba(61, 242, 255, 0.3);
+    box-shadow: 0 0 15px var(--ciano-escuro);
     z-index: 1000;
     font-size: 2rem; 
     padding: 10px 0;
