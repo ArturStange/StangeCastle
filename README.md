@@ -114,6 +114,7 @@ IA             → O Conselheiro (LLM Local + SLM intermediário + RAG)
 
 - [x] Estrutura base da aplicação (ASP.NET Core)
 - [x] Portfólio Público
+- [x] Sistema de Login e Cadastro
 - [ ] Módulo de Autenticação com RBAC
 - [ ] StangeTreasury — Drive Pessoal
 - [ ] StangeLibrary — CMS de TTRPG com editor rico
