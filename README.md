@@ -58,7 +58,7 @@ Interface de chat integrada a um modelo de linguagem hospedado localmente, espec
 | RF01 | Portfólio | Exibição pública de projetos, certificados e conquistas |
 | RF02 | Portfólio | Redirecionamentos para GitHub e documentações externas |
 | RF03 | Autenticação | Login e logout de usuários registrados |
-| RF04 | Autenticação | Controle de acesso baseado em funções (RBAC) |
+| RF04 | Autenticação | Usuários são cadastrados apenas pelo Administrador |
 | RF05 | Drive | Upload, download e exclusão de arquivos pelo Administrador |
 | RF06 | Drive | Criação, renomeação e exclusão de pastas |
 | RF07 | Drive | Bloqueio total para usuários não autenticados |
