@@ -1,0 +1,217 @@
+@{
+    ViewData["Title"] = "Sala do Trono";
+}
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 class="glow" style="color: var(--vinho); text-shadow: 0 0 15px var(--vinho);">[!] SALA DO TRONO [!]</h1>
+    <a asp-action="Trancar" class="btn" style="color: var(--offwhite); border-color: var(--vinho);">[ TRANCAR SALA ]</a>
+</div>
+
+<p style="color: var(--vinho-leve);">Bem-vindo, Majestade. Todos os sistemas estão a aguardar os seus comandos.</p>
+
+<div class="trono-grid">
+    
+    <div class="trono-panel trono-full-width">
+        <div class="trono-panel">
+            <h3 class="trono-panel-title">
+                <span>>_ Monitor_Sistema.exe</span>
+                <span id="status-monitor" style="color: var(--ciano); text-shadow: 0 0 5px var(--ciano);">[ INICIANDO... ]</span>
+            </h3>
+            
+            <div style="font-family: 'Courier New', Courier, monospace; margin-top: 15px;">
+                <p style="margin: 8px 0; display: flex; justify-content: space-between;">
+                    <span style="color: var(--lilas);">OS_HOST:</span> <span style="color: var(--offwhite);" id="hw-os">...</span>
+                </p>
+                <p style="margin: 8px 0; display: flex; justify-content: space-between;">
+                    <span style="color: var(--lilas);">UPTIME:</span> <span style="color: var(--ciano);" id="hw-uptime">...</span>
+                </p>
+                
+                <div style="border-top: 1px dashed var(--vinho-escuro); margin: 10px 0;"></div>
+                
+                <p style="margin: 8px 0; display: flex; justify-content: space-between;">
+                    <span style="color: var(--lilas);">CPU_PROCESSAMENTO:</span> 
+                    <span style="color: var(--ciano);"><span id="hw-cpuuso">...</span> %</span>
+                </p>
+
+                <div style="width: 100%; background-color: rgba(0,0,0,0.5); border: 1px solid var(--ciano-escuro); height: 6px; margin-top: 2px; margin-bottom: 8px;">
+                    <div id="hw-barracpu" style="width: 0%; background-color: var(--ciano); height: 100%; transition: width 0.5s;"></div>
+                </div>
+
+                <p style="margin: 8px 0; display: flex; justify-content: space-between;">
+                    <span style="color: var(--lilas);">CPU_CORES:</span> <span style="color: var(--offwhite);"><span id="hw-cpu">...</span> Lógicos</span>
+                </p>
+                <p style="margin: 8px 0; display: flex; justify-content: space-between;">
+                    <span style="color: var(--lilas);">RAM_SERVIDOR:</span> <span style="color: var(--offwhite);"><span id="hw-ramtotal">...</span> GB</span>
+                </p>
+                <p style="margin: 8px 0; display: flex; justify-content: space-between;">
+                    <span style="color: var(--lilas);">RAM_WEBAPP:</span> <span style="color: var(--ciano);"><span id="hw-ramapp">...</span> MB</span>
+                </p>
+
+                <div style="border-top: 1px dashed var(--vinho-escuro); margin: 10px 0;"></div>
+                <p style="margin: 8px 0; display: flex; justify-content: space-between;">
+                    <span style="color: var(--lilas);">GPU_USO:</span> <span style="color: var(--roxo-neon);"><span id="hw-gpu">...</span>%</span>
+                </p>
+                <p style="margin: 8px 0; display: flex; justify-content: space-between;">
+                    <span style="color: var(--lilas);">VRAM_USADA:</span> <span style="color: var(--ciano);"><span id="hw-vramusada">...</span> MB / <span id="hw-vramtotal">...</span> MB</span>
+                </p>
+
+                <div style="border-top: 1px dashed var(--vinho-escuro); margin: 10px 0;"></div>
+                
+                <p style="margin: 8px 0; display: flex; justify-content: space-between;">
+                    <span style="color: var(--lilas);">DISCO_PRINCIPAL:</span> 
+                    <span style="color: var(--offwhite);">Livre: <span style="color: var(--ciano);" id="hw-discolivre">...</span> GB / <span id="hw-discototal">...</span> GB</span>
+                </p>
+                
+                <div style="width: 100%; background-color: rgba(0,0,0,0.5); border: 1px solid var(--vinho-escuro); height: 10px; margin-top: 5px;">
+                    <div id="hw-barradisco" style="width: 0%; background-color: var(--vinho-leve); height: 100%; transition: width 0.5s;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="trono-panel">
+        <h3 class="trono-panel-title">
+            <span>>_ Stange_Treasure.exe (Drive)</span>
+            <span style="color: var(--ciano);">[ SISTEMA DE ARQUIVOS ]</span>
+        </h3>
+        <p style="color: var(--offwhite); margin-bottom: 20px;">
+            Aceda ao cofre pessoal do servidor. Gestão de pastas, visualização de imagens, edição de pergaminhos e armazenamento seguro.
+        </p>
+        <div style="text-align: center;">
+            <a asp-controller="Treasure" asp-action="Index" class="btn pulse" style="color: var(--roxo-neon); border-color: var(--roxo-neon); font-size: 1.2rem; text-decoration: none;">
+                [ ABRIR COFRE ]
+            </a>
+        </div>
+    </div>
+
+   <div class="trono-panel trono-full-width">
+        <h3 class="trono-panel-title">
+            <span>>_ Controle_Populacional.exe (Usuários e Banimentos)</span>
+        </h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 15px;">
+            
+            <div>
+                <h4 style="color: var(--ciano); margin-bottom: 10px;">> Cidadãos Registrados:</h4>
+                <div style="max-height: 200px; overflow-y: auto; border: 1px solid var(--ciano-escuro); padding: 10px; background-color: rgba(0,0,0,0.5);">
+                    @if (ViewBag.RegisteredUsers == null || ViewBag.RegisteredUsers.Count == 0)
+                    {
+                        <p style="color: var(--offwhite); margin: 0; font-size: 0.9rem;">Nenhum viajante cruzou os portões ainda.</p>
+                    }
+                    else
+                    {
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            @foreach (var email in ViewBag.RegisteredUsers)
+                            {
+                                bool isBanned = ViewBag.BannedUsers.Contains(email);
+                                
+                                <li style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--ciano-escuro); padding: 5px 0;">
+                                    <span style="color: @(isBanned ? "var(--vinho)" : "var(--offwhite)"); text-decoration: @(isBanned ? "line-through" : "none");">
+                                        @email
+                                    </span>
+                                    
+                                    @if (!isBanned)
+                                    {
+                                        <form asp-action="BanirUsuario" method="post" style="margin: 0;">
+                                            <input type="hidden" name="emailBanir" value="@email" />
+                                            <button type="submit" style="background: none; border: 1px solid var(--vinho); color: var(--vinho); cursor: pointer; padding: 2px 5px; font-family: 'Pixelify Sans', sans-serif;">[EXILAR]</button>
+                                        </form>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+
+            <div>
+                <h4 style="color: var(--vinho); margin-bottom: 10px;">> Registos de Exílio (Lista Negra):</h4>
+                
+                <form asp-action="BanirUsuario" method="post" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <input type="email" name="emailBanir" class="input-terminal" style="margin: 0; flex-grow: 1; padding: 5px;" placeholder="Email do herege..." required />
+                    <button type="submit" class="btn pulse" style="margin: 0; color: var(--vinho); border-color: var(--vinho);">[BANIR]</button>
+                </form>
+
+                <div style="max-height: 140px; overflow-y: auto; border: 1px solid var(--vinho-escuro); padding: 10px; background-color: rgba(122, 8, 49, 0.1);">
+                    @if (ViewBag.BannedUsers == null || ViewBag.BannedUsers.Count == 0)
+                    {
+                        <p style="color: var(--offwhite); margin: 0; font-size: 0.9rem;">Nenhum usuário banido.</p>
+                    }
+                    else
+                    {
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            @foreach (var email in ViewBag.BannedUsers)
+                            {
+                                <li style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--vinho-escuro); padding: 5px 0;">
+                                    <span style="color: var(--vinho-leve);">@email</span>
+                                    
+                                    <form asp-action="DesbanirUsuario" method="post" style="margin: 0;">
+                                        <input type="hidden" name="emailDesbanir" value="@email" />
+                                        <button type="submit" style="background: none; border: 1px solid var(--ciano); color: var(--ciano); cursor: pointer; padding: 2px 5px; font-family: 'Pixelify Sans', sans-serif;">[ REVOGAR ]</button>
+                                    </form>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+<div class="trono-panel trono-full-width">
+        <h3 class="trono-panel-title">
+            <span>>_ Editar_Pergaminhos.exe (Wiki CMS)</span>
+        </h3>
+        <p style="color: var(--lilas); margin-bottom: 15px;">
+            Atenção: Utilize tags HTML básicas para formatar. Exemplo: <code>&lt;section id="continente" class="wiki-section"&gt; ... &lt;/section&gt;</code> para que a barra lateral funcione.
+        </p>
+        
+        <form asp-action="SalvarWiki" method="post">
+            <textarea name="conteudoWiki" class="input-terminal" style="width: 100%; height: 400px; resize: vertical; text-align: left; font-family: monospace; white-space: pre-wrap; padding: 15px;" placeholder="Escreva a lore de Mythos aqui...">@ViewBag.WikiContent</textarea>
+            
+            <div style="text-align: right; margin-top: 10px;">
+                <button type="submit" class="btn pulse" style="color: var(--roxo-neon); border-color: var(--roxo-neon); font-size: 1.2rem;">
+                    [ GUARDAR PERGAMINHOS ]
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function atualizarMonitor() {
+            fetch('/Trono/GetMetricasHardware')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('status-monitor').innerText = "[ ONLINE - TEMPO REAL ]";
+                    document.getElementById('hw-os').innerText = data.os;
+                    document.getElementById('hw-uptime').innerText = data.uptime;
+                    
+                    // Atualiza o texto e a barra da CPU
+                    document.getElementById('hw-cpuuso').innerText = data.cpuUso;
+                    document.getElementById('hw-barracpu').style.width = data.cpuUso + "%";
+                    
+                    document.getElementById('hw-cpu').innerText = data.cpuCores;
+                    document.getElementById('hw-ramtotal').innerText = data.ramTotal;
+                    document.getElementById('hw-ramapp').innerText = data.ramApp;
+                    document.getElementById('hw-discolivre').innerText = data.discoLivre;
+                    document.getElementById('hw-discototal').innerText = data.discoTotal;
+                    document.getElementById('hw-barradisco').style.width = data.percDisco + "%";
+                    
+                    document.getElementById('hw-gpu').innerText = data.gpuUso;
+                    document.getElementById('hw-vramusada').innerText = data.vramUsada;
+                    document.getElementById('hw-vramtotal').innerText = data.vramTotal;
+                })
+                .catch(error => {
+                    document.getElementById('status-monitor').innerText = "[ FALHA NA CONEXÃO ]";
+                    document.getElementById('status-monitor').style.color = "red";
+                });
+        }
+
+        atualizarMonitor();
+        // Dispara a cada 3 segundos (3000ms) para ter o tempo real
+        setInterval(atualizarMonitor, 3000);
+    </script>
+}

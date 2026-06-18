@@ -1,0 +1,24 @@
+@{
+    ViewData["Title"] = "Portão Restrito";
+}
+
+<div class="portao-container pulse">
+    <h1 style="color: var(--vinho); text-shadow: 0 0 10px var(--vinho);">ACESSO RESTRITO</h1>
+    <p>Nível de Segurança Máximo. Insira a Chave-Mestra do Reino.</p>
+
+    @if (ViewBag.Erro != null)
+    {
+        <p style="color: red; font-weight: bold; margin: 15px 0;">[!] @ViewBag.Erro</p>
+    }
+
+    @if (ViewBag.Bloqueado != true)
+    {
+        <form asp-action="ValidarSenha" method="post">
+            <input type="password" name="senha" class="input-terminal" placeholder="********" autocomplete="off" autofocus required />
+            <br />
+            <button type="submit" class="btn" style="border-color: var(--vinho); color: var(--vinho);">
+                [ DESTRANCAR ]
+            </button>
+        </form>
+    }
+</div>

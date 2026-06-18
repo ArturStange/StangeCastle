@@ -1,0 +1,164 @@
+@using System.IO
+@{
+    ViewData["Title"] = "Stange Treasure";
+    string pathAtual = ViewBag.CaminhoAtual;
+    string pathPai = ViewBag.CaminhoPai;
+    List<string> todasPastas = ViewBag.TodasPastas;
+}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1 class="glow" style="color: var(--roxo-neon); margin: 0;">[ STANGE TREASURE ]</h1>
+    <a asp-controller="Trono" asp-action="Index" class="btn" style="color: var(--vinho); border-color: var(--vinho); margin:0;">[ VOLTAR AO TRONO ]</a>
+    <a asp-action="FazerBackup" class="btn pulse" style="color: var(--ciano); border-color: var(--ciano); margin:0; margin-right: 10px;">[ GERAR BACKUP (.ZIP) ]</a>
+</div>
+
+@if (ViewBag.Erro != null)
+{
+    <p style="color: var(--vinho); font-weight: bold; padding: 10px; border: 1px solid var(--vinho); background: rgba(122,8,49,0.2);">
+        [!] @ViewBag.Erro
+    </p>
+}
+
+<div style="background-color: var(--preto); border: 1px solid var(--ciano-escuro); padding: 10px; margin-bottom: 20px;">
+    <span style="color: var(--lilas);">Caminho:</span> 
+    <span style="color: var(--ciano);">root / @(string.IsNullOrEmpty(pathAtual) ? "" : pathAtual.Replace("\\", " / "))</span>
+</div>
+
+<div class="trono-panel trono-full-width" style="margin-bottom: 20px;">
+    <h4 style="color: var(--lilas); margin-top:0;">> Diário do Mestre / Backlog</h4>
+    <form asp-action="SalvarBacklog" method="post" style="display: flex; gap: 10px;">
+        <input type="hidden" name="pathAtual" value="@pathAtual" />
+        <textarea name="conteudoBacklog" class="input-terminal" style="flex-grow: 1; height: 80px; resize: vertical; padding: 10px;" placeholder="Anotações rápidas, pendências...">@ViewBag.Backlog</textarea>
+        <button type="submit" class="btn" style="border-color: var(--lilas); color: var(--lilas);">[SALVAR]</button>
+    </form>
+</div>
+
+<div class="trono-grid" style="margin-bottom: 20px;">
+    <div class="trono-panel" style="padding: 15px;">
+        <h4 style="color: var(--offwhite); margin-top:0;">> Criar Diretório Aqui</h4>
+        <form asp-action="CriarPasta" method="post" style="display: flex; gap: 10px;">
+            <input type="hidden" name="pathAtual" value="@pathAtual" />
+            <input type="text" name="nomePasta" class="input-terminal" style="margin:0; padding:5px; flex-grow:1;" placeholder="Nome da pasta..." required />
+            <button type="submit" class="btn" style="margin:0; border-color: var(--ciano);">[CRIAR]</button>
+        </form>
+    </div>
+
+    <div class="trono-panel" style="padding: 15px;">
+        <h4 style="color: var(--offwhite); margin-top:0;">> Enviar Arquivo</h4>
+        <form asp-action="Upload" method="post" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center;">
+            <input type="hidden" name="pathAtual" value="@pathAtual" />
+            <input type="file" name="arquivosUpload" class="input-terminal" style="margin:0; padding:2px; flex-grow:1; width: 100px;" multiple required />
+            
+            <span style="color: var(--lilas);">Para:</span>
+            <select name="destinoUpload" class="input-terminal" style="margin:0; padding:2px; height: 32px; border-color: var(--roxo-neon);">
+                @foreach (var p in todasPastas)
+                {
+                    string displayPath = p == "" ? "/ (Raiz)" : "/" + p.Replace("\\", "/");
+                    if (p == pathAtual) { <option value="@p" selected>@displayPath</option> }
+                    else { <option value="@p">@displayPath</option> }
+                }
+            </select>
+
+            <button type="submit" class="btn pulse" style="margin:0; border-color: var(--roxo-neon); color: var(--roxo-neon);">[ UPLOAD ]</button>
+        </form>
+    </div>
+</div>
+
+<div class="trono-panel trono-full-width" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 700px;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--vinho-escuro); color: var(--lilas);">
+                <th style="padding: 10px;">Nome do Item</th>
+                <th style="padding: 10px; text-align: right;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (pathAtual != "")
+            {
+                <tr style="border-bottom: 1px dashed var(--ciano-escuro);">
+                    <td style="padding: 10px;">
+                        <a asp-action="Index" asp-route-path="@pathPai" style="color: var(--ciano); font-weight: bold;">[ .. ] Voltar</a>
+                    </td>
+                    <td></td>
+                </tr>
+            }
+
+            @foreach (var pasta in ViewBag.Pastas)
+            {
+                <tr style="border-bottom: 1px dashed var(--ciano-escuro);">
+                    <td style="padding: 10px;">
+                        <span style="color: var(--offwhite);">[ DIR ]</span> 
+                        <a asp-action="Index" asp-route-path="@System.IO.Path.Combine(pathAtual, pasta)" style="color: var(--roxo-neon); text-decoration: underline;">@pasta</a>
+                    </td>
+                    <td style="padding: 10px; text-align: right; display: flex; justify-content: flex-end; gap: 10px; align-items: center; white-space: nowrap; flex-wrap: wrap;">
+                        
+                        <form asp-action="Mover" method="post" style="display: flex; gap: 5px; margin: 0;">
+                            <input type="hidden" name="pathAtual" value="@pathAtual" />
+                            <input type="hidden" name="nomeItem" value="@pasta" />
+                            <select name="destinoItem" class="input-terminal" style="margin:0; padding:0 5px; height: 22px; font-size: 0.8rem; border-color: var(--lilas);">
+                                @foreach (var p in todasPastas)
+                                {
+                                    string displayPath = p == "" ? "/" : "/" + p.Replace("\\", "/");
+                                    <option value="@p">@displayPath</option>
+                                }
+                            </select>
+                            <button type="submit" style="background: none; border: 1px solid var(--lilas); color: var(--lilas); cursor: pointer; padding: 2px 5px; font-family: inherit;">[ MOVER ]</button>
+                        </form>
+
+                        <form asp-action="Deletar" method="post" style="margin: 0;" onsubmit="return confirm('Deseja destruir este diretório e TUDO o que ele contém?');">
+                            <input type="hidden" name="pathAtual" value="@pathAtual" />
+                            <input type="hidden" name="nomeItem" value="@pasta" />
+                            <input type="hidden" name="isPasta" value="true" />
+                            <button type="submit" style="background: none; border: 1px solid var(--vinho); color: var(--vinho); cursor: pointer; padding: 2px 5px; font-family: inherit;">[ X ]</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+
+            @foreach (var arquivo in ViewBag.Arquivos)
+            {
+                string ext = System.IO.Path.GetExtension(arquivo).ToLower();
+                bool isImagem = ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif";
+                bool isTexto = ext == ".txt" || ext == ".md" || ext == ".html" || ext == ".json";
+
+                <tr style="border-bottom: 1px dashed var(--ciano-escuro);">
+                    <td style="padding: 10px; color: var(--ciano);">
+                        [ FILE ] @arquivo
+                    </td>
+                    <td style="padding: 10px; text-align: right; display: flex; justify-content: flex-end; gap: 10px; align-items: center;">
+                        
+                        <form asp-action="Mover" method="post" style="display: flex; gap: 5px; margin: 0;">
+                            <input type="hidden" name="pathAtual" value="@pathAtual" />
+                            <input type="hidden" name="nomeItem" value="@arquivo" />
+                            <select name="destinoItem" class="input-terminal" style="margin:0; padding:0 5px; height: 22px; font-size: 0.8rem; border-color: var(--lilas);">
+                                @foreach (var p in todasPastas)
+                                {
+                                    string displayPath = p == "" ? "/" : "/" + p.Replace("\\", "/");
+                                    <option value="@p">@displayPath</option>
+                                }
+                            </select>
+                            <button type="submit" style="background: none; border: 1px solid var(--lilas); color: var(--lilas); cursor: pointer; padding: 2px 5px; font-family: inherit;">[MOVER]</button>
+                        </form>
+
+                        @if (isImagem) { <a target="_blank" href="@Url.Action("ServirArquivo", new { pathAtual = pathAtual, nomeArquivo = arquivo, download = false })" style="color: var(--ciano); border-bottom: 1px solid;">[ VER ]</a> }
+                        @if (isTexto) { <a asp-action="Editar" asp-route-pathAtual="@pathAtual" asp-route-nomeArquivo="@arquivo" style="color: var(--lilas); border-bottom: 1px solid;">[EDITAR]</a> }
+                        
+                        <a href="@Url.Action("ServirArquivo", new { pathAtual = pathAtual, nomeArquivo = arquivo, download = true })" style="color: var(--offwhite); border-bottom: 1px solid;">[DOWNLOAD]</a>
+
+                        <form asp-action="Deletar" method="post" style="margin: 0;">
+                            <input type="hidden" name="pathAtual" value="@pathAtual" />
+                            <input type="hidden" name="nomeItem" value="@arquivo" />
+                            <input type="hidden" name="isPasta" value="false" />
+                            <button type="submit" style="background: none; border: 1px solid var(--vinho); color: var(--vinho); cursor: pointer; padding: 2px 5px; font-family: inherit;">[ X ]</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    
+    @if (ViewBag.Pastas.Count == 0 && ViewBag.Arquivos.Count == 0)
+    {
+        <p style="text-align: center; color: var(--vinho-escuro); margin-top: 20px;">O vácuo domina este espaço. A pasta está vazia.</p>
+    }
+</div>

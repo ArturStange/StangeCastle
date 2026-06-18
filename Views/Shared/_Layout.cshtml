@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - StangeCastle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="pilastra esquerda"></div>
+    <div class="pilastra direita"></div>
+
+    <div class="terminal-container">
+        <header>
+            <nav class="top-nav">
+                <span>root@stangecastle:~# </span>
+                <a asp-controller="Home" asp-action="Index">/cd /salão_principal</a>
+                
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <span> | </span>
+                    <a asp-controller="Biblioteca" asp-action="Index">/cd /biblioteca</a>
+                    
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <span> | </span>
+                        <a asp-controller="Trono" asp-action="Index">/cd /sala_do_trono</a>
+                    }
+                    
+                    <span> | </span>
+                    <a asp-controller="Autenticacao" asp-action="Logout" style="color: var(--vinho);">[Logout]</a>
+                }
+                else
+                {
+                    <span> | </span>
+                    <a asp-controller="Autenticacao" asp-action="LoginGoogle" style="color: var(--lilas);">[Login Google]</a>
+                }
+            </nav>
+        </header>
+
+        <main role="main">
+            @RenderBody()
+        </main>
+
+        <br />
+        <footer>
+            <p>SISTEMA INICIADO... <span style="color: var(--offwhite);">Status: ONLINE</span></p>
+        </footer>
+    </div>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

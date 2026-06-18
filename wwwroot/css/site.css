@@ -1,0 +1,402 @@
+html {
+    scroll-behavior: smooth; /* Faz a página deslizar suavemente até o tópico */
+}
+
+:root {
+    --preto: #000000;
+    --offwhite: #F5E8FF;
+    --ciano: #3DF2FF;
+    --ciano-escuro: rgba(61, 242, 255, 0.2);
+    --roxo-neon: #A33BFF;
+    --lilas: #C07BFF;
+    --vinho: #7A0831;
+    --vinho-leve: rgba(150, 18, 66, 0.9);
+    --vinho-transparente: rgba(122, 8, 49, 0.4);
+    --vinho-escuro: rgba(163, 59, 255, 0.15);
+}
+
+/* Força o padrão pixelado em absolutamente tudo */
+body, button, input, select, textarea, .btn, .btn-terminal, p, h1, h2, h3, h4, h5, h6, a, span {
+    font-family: 'Pixelify Sans', sans-serif !important;
+}
+
+body {
+    background-color: var(--preto);
+    color: var(--ciano);
+    margin: 0;
+    padding: 20px;
+}
+
+a {
+    color: var(--ciano);
+    text-decoration: none;
+}
+
+/* Header Fixo/Sticky: Contém a barra de navegação e o Banner */
+header {
+    position: sticky;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.95); /* Leve transparência ao rolar o conteúdo */
+    border: 2px solid var(--roxo-neon);
+    padding: 15px;
+    z-index: 1000;
+    box-shadow: 0 4px 10px var(--vinho-escuro);
+    margin-bottom: 30px;
+}
+
+.top-nav {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+/* Novo container expandido para o Banner */
+.banner-container {
+    width: 100%;
+    width: 100%;
+    max-width: 1920px;
+    height: auto;
+}
+
+.banner-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Garante que o banner preencha o espaço proporcionalmente */
+}
+
+/* Efeitos visuais */
+.glow {
+    color: var(--roxo-neon);
+    text-shadow: 0 0 10px var(--roxo-neon), 0 0 20px var(--roxo-neon);
+}
+
+.glow-small {
+    color: var(--ciano);
+    text-shadow: 0 0 5px var(--ciano);
+}
+
+.glow-card-title {
+    color: var(--roxo-neon);
+    text-shadow: 0 0 5px var(--roxo-neon), 0 0 10px var(--roxo-neon);
+    margin-top: 0;
+    font-size: 1.6rem;
+}
+
+.fade-in {
+    color: var(--offwhite);
+    animation: fadeIn 2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Layout de Seções e Cards */
+.portfolio-intro {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px; /* Aumentei o gap para os cards respirarem mais */
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.section.big {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.card {
+    background-color: var(--preto);
+    border: 1px solid var(--vinho-escuro);
+    padding: 30px; /* Aumentado o padding para melhorar a leitura */
+    box-shadow: 0 0 8px var(--vinho-transparente);
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+
+.section .card {
+    width: 400px; /* Aumentado de 280px para 400px */
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.section.big .card {
+    width: 100%;
+    max-width: 900px; /* Limite máximo para não esticar demais em telas ultrawide */
+    border-color: var(--roxo-neon); /* Borda destacada com a cor principal */
+    box-shadow: 0 0 15px var(--vinho-escuro);
+}
+
+.card.float:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px var(--roxo-neon); /* Sombra roxa ao passar o mouse */
+    border-color: var(--roxo-neon);
+}
+
+/* Aumentando o tamanho da fonte padrão dentro dos cards */
+.card p {
+    color: var(--offwhite);
+    font-size: 1.25rem;
+    line-height: 1.6;
+}
+
+/* Botões */
+.btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 8px 16px;
+    background-color: transparent;
+    color: var(--lilas);
+    border: 1px solid var(--lilas);
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn.pulse:hover {
+    background-color: var(--vinho-leve);
+    border-color: var(--roxo-neon);
+    color: var(--offwhite);
+    box-shadow: 0 0 15px var(--vinho);
+}
+
+.terminal-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+/* =========================================
+   TELA DA BIBLIOTECA (WIKI DO RPG)
+   ========================================= */
+
+.btn-fixed {
+    position: fixed;
+    bottom: 30px;
+    right: 30px; /* Mantém o botão no canto inferior direito do ecrã */
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.85); /* Fundo escuro para não atrapalhar a leitura */
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 15px var(--ciano-escuro);
+}
+
+.wiki-wrapper {
+    display: flex;
+    align-items: flex-start; /* Necessário para o sticky funcionar corretamente */
+    min-height: 70vh;
+    border: 1px solid var(--vinho-escuro);
+    background-color: rgba(0, 0, 0, 0.7);
+    margin-top: 20px;
+    box-shadow: 0 0 15px var(--vinho-transparente);
+}
+
+/* Barra Lateral Fixa */
+.wiki-sidebar {
+    width: 250px;
+    background-color: var(--preto);
+    border-right: 2px solid var(--roxo-neon);
+    padding: 20px;
+    /* Alterado para animar 'all' em vez de apenas a margem */
+    transition: all 0.4s ease-in-out; 
+    flex-shrink: 0;
+    
+    position: sticky;
+    top: 100px; 
+    max-height: calc(100vh - 120px); 
+    overflow-y: auto; 
+    overflow-x: hidden; /* Impede que os links fiquem desconfigurados ao encolher */
+    white-space: nowrap; /* Mantém o texto numa só linha durante a animação */
+    z-index: 10;
+}
+
+/* Quando colapsada, a barra desaparece totalmente e liberta o espaço físico */
+.wiki-sidebar.collapsed {
+    width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    border-right: none;
+    opacity: 0;
+}
+
+/* Esconde a barra de rolagem da sidebar por estética (opcional) */
+.wiki-sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+.wiki-sidebar::-webkit-scrollbar-thumb {
+    background: var(--vinho-escuro); 
+}
+
+/* Lista de Tópicos */
+.wiki-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.wiki-nav-list li {
+    margin-bottom: 10px;
+}
+
+.wiki-nav-list a {
+    color: var(--lilas);
+    font-size: 1.2rem;
+    display: block;
+    padding: 8px 10px;
+    border-left: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.wiki-nav-list a:hover, .wiki-nav-list a.active {
+    color: var(--ciano);
+    border-left: 2px solid var(--ciano);
+    background-color: var(--ciano-escuro);
+}
+
+/* Área de Conteúdo da Wiki */
+.wiki-content {
+    flex-grow: 1;
+    padding: 30px;
+    color: var(--offwhite);
+    font-size: 1.25rem;
+    line-height: 1.6;
+    transition: all 0.4s ease-in-out; /* O texto vai expandir-se suavemente */
+}
+
+.wiki-title {
+    color: var(--roxo-neon);
+    border-bottom: 1px dashed var(--roxo-neon);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 8px var(--roxo-neon);
+}
+
+.wiki-section {
+    margin-bottom: 60px;
+    padding-top: 20px; /* Espaço extra para quando a âncora pular para cá */
+}
+
+/* =========================================
+   SALA DO TRONO (DASHBOARD ADMIN)
+   ========================================= */
+.trono-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+    margin-top: 20px;
+}
+
+.trono-panel {
+    background-color: var(--preto);
+    border: 1px solid var(--vinho-escuro);
+    padding: 20px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 0 10px var(--vinho-transparente);
+}
+
+.trono-panel-title {
+    color: var(--vinho);
+    border-bottom: 1px solid var(--vinho);
+    padding-bottom: 10px;
+    margin-top: 0;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.trono-full-width {
+    grid-column: 1 / -1; /* Ocupa a largura toda */
+}
+
+/* Formulário do Portão (Dupla Autenticação) */
+.portao-container {
+    max-width: 400px;
+    margin: 100px auto;
+    text-align: center;
+    border: 2px solid var(--vinho);
+    padding: 40px;
+    background-color: rgba(122, 8, 49, 0.1);
+}
+
+.input-terminal {
+    background-color: var(--preto);
+    color: var(--ciano);
+    border: 1px solid var(--ciano-escuro);
+    padding: 10px;
+    width: 80%;
+    margin: 20px 0;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 1.2rem;
+    text-align: center;
+}
+.input-terminal:focus {
+    outline: none;
+    border-color: var(--roxo-neon);
+    box-shadow: 0 0 8px var(--roxo-neon);
+}
+
+/* =========================================
+   SESSÃO DE CONTATOS (PORTFÓLIO)
+   ========================================= */
+.contact-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 30px; /* Espaço entre os contatos */
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0 0;
+}
+
+.contact-list li {
+    font-size: 1.3rem;
+    color: var(--offwhite);
+}
+
+.contact-list a {
+    color: var(--ciano);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--ciano-escuro);
+    transition: all 0.3s ease;
+}
+
+.contact-list a:hover {
+    color: var(--roxo-neon);
+    border-bottom-color: var(--roxo-neon);
+    text-shadow: 0 0 8px var(--roxo-neon);
+}
+
+/* =========================================
+   PILASTRAS MEDIEVAIS
+   ========================================= */
+.pilastra {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 15vw; /* Ocupa 15% da tela de cada lado */
+    max-width: 200px;
+    z-index: -1; /* Fica atrás do conteúdo */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.35; /* Deixa um pouco transparente para não ofuscar o neon */
+}
+
+.pilastra.esquerda {
+    left: 0;
+    background-image: url('/imgs/SC_Pilar_Background.png'); /* Coloque sua imagem aqui */
+}
+
+.pilastra.direita {
+    right: 0;
+    background-image: url('/imgs/SC_Pilar_Background.png'); /* A mesma imagem... */
+    transform: scaleX(-1); /* ...mas espelhada! */
+}

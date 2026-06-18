@@ -1,0 +1,67 @@
+@{
+    ViewData["Title"] = "Biblioteca - Wiki Mythos";
+}
+
+<div>
+    <button id="toggleSidebar" class="btn pulse btn-fixed" style="margin-top: 0;">
+        [ >_ ALTERNAR MENU_WIKI ]
+    </button>
+
+    <div class="wiki-wrapper">
+        
+        <aside class="wiki-sidebar" id="sidebar">
+            <h3 class="glow-small" style="margin-top: 0; border-bottom: 1px solid var(--ciano-escuro); padding-bottom: 10px;">
+                > Diretórios
+            </h3>
+            <ul class="wiki-nav-list">
+                <li><a href="#introducao">Introdução</a></li>
+                <li><a href="#mecanicas">Mecânicas</a></li>
+                <li><a href="#continente">Continente</a></li>
+                <li><a href="#reinos">Reinos</a></li>
+                <li><a href="#personagens">Personagens</a></li>
+                <li><a href="#dungeons">Dungeons</a></li>
+                <li><a href="#especies">Espécies Conscientes</a></li>
+                <li><a href="#deuses">Deuses</a></li>
+                <li><a href="#magias">Magias e Rituais</a></li>
+                <li><a href="#monstros">Monstros</a></li>
+                <li><a href="#itens">Itens</a></li>
+            </ul>
+        </aside>
+
+        <article class="wiki-content"> 
+            @Html.Raw(ViewBag.WikiContent)
+        </article>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Funcionalidade de abrir/fechar sidebar
+        document.getElementById("toggleSidebar").addEventListener("click", function () {
+            document.getElementById("sidebar").classList.toggle("collapsed");
+        });
+
+        // Script opcional para destacar o link na sidebar conforme você rola a tela
+        const sections = document.querySelectorAll('.wiki-section');
+        const navLinks = document.querySelectorAll('.wiki-nav-list a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href').includes(current)) {
+                    a.classList.add('active');
+                }
+            });
+        });
+    </script>
+}

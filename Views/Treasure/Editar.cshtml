@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Editor de Pergaminhos";
+}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1 class="glow" style="color: var(--lilas); margin: 0;">>_ Editando: @ViewBag.NomeArquivo</h1>
+    <a asp-action="Index" asp-route-path="@ViewBag.CaminhoAtual" class="btn" style="color: var(--vinho); border-color: var(--vinho); margin:0;">[ CANCELAR ]</a>
+</div>
+
+<div class="trono-panel trono-full-width">
+    <form asp-action="SalvarEdicao" method="post">
+        <input type="hidden" name="pathAtual" value="@ViewBag.CaminhoAtual" />
+        <input type="hidden" name="nomeArquivo" value="@ViewBag.NomeArquivo" />
+        
+        <textarea name="conteudo" class="input-terminal" style="width: 100%; height: 60vh; resize: vertical; text-align: left; font-family: monospace; white-space: pre-wrap; padding: 15px;" spellcheck="false">@ViewBag.Conteudo</textarea>
+        
+        <div style="text-align: right; margin-top: 15px;">
+            <button type="submit" class="btn pulse" style="color: var(--ciano); border-color: var(--ciano); font-size: 1.2rem;">
+                [ SOBRESCREVER ARQUIVO ]
+            </button>
+        </div>
+    </form>
+</div>

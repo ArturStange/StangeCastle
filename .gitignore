@@ -1,0 +1,17 @@
+# Pastas de compilação do .NET
+bin/
+obj/
+.vs/
+
+# Credenciais e Segredos
+appsettings.json
+appsettings.Development.json
+*.user
+
+# Ficheiros e Pastas gerados dinamicamente pelo Homelab
+StangeTreasure_Drive/
+ListaNegra.txt
+UsuariosCadastrados.txt
+WikiContent.html
+.backlog.txt
+Backup_Temporario.zip
