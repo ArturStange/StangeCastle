@@ -24,15 +24,6 @@
     <span style="color: var(--ciano);">root / @(string.IsNullOrEmpty(pathAtual) ? "" : pathAtual.Replace("\\", " / "))</span>
 </div>
 
-<div class="trono-panel trono-full-width" style="margin-bottom: 20px;">
-    <h4 style="color: var(--lilas); margin-top:0;">> Diário do Mestre / Backlog</h4>
-    <form asp-action="SalvarBacklog" method="post" style="display: flex; gap: 10px;">
-        <input type="hidden" name="pathAtual" value="@pathAtual" />
-        <textarea name="conteudoBacklog" class="input-terminal" style="flex-grow: 1; height: 80px; resize: vertical; padding: 10px;" placeholder="Anotações rápidas, pendências...">@ViewBag.Backlog</textarea>
-        <button type="submit" class="btn" style="border-color: var(--lilas); color: var(--lilas);">[SALVAR]</button>
-    </form>
-</div>
-
 <div class="trono-grid" style="margin-bottom: 20px;">
     <div class="trono-panel" style="padding: 15px;">
         <h4 style="color: var(--offwhite); margin-top:0;">> Criar Diretório Aqui</h4>
@@ -161,4 +152,13 @@
     {
         <p style="text-align: center; color: var(--vinho-escuro); margin-top: 20px;">O vácuo domina este espaço. A pasta está vazia.</p>
     }
+</div>
+
+<div class="trono-panel trono-full-width" style="margin-bottom: 20px;">
+    <h4 style="color: var(--lilas); margin-top:0;">> Diário do Mestre / Backlog</h4>
+    <form asp-action="SalvarBacklog" method="post" style="display: flex; gap: 10px;">
+        <input type="hidden" name="pathAtual" value="@pathAtual" />
+        <textarea name="conteudoBacklog" class="input-terminal" style="flex-grow: 1; height: 500px; resize: vertical; padding: 10px;" placeholder="Anotações rápidas, pendências...">@ViewBag.Backlog</textarea>
+        <button type="submit" class="btn" style="border-color: var(--lilas); color: var(--lilas);">[SALVAR]</button>
+    </form>
 </div>

@@ -5,24 +5,17 @@ services:
     build: .
     container_name: stange_castle_app
     restart: unless-stopped
+    ports:
+      - "4233:4233"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
     volumes:
-      # MAPEAMENTO DE VOLUMES: Impede que os seus dados sejam apagados se o Docker reiniciar
       - ./StangeTreasure_Drive:/app/StangeTreasure_Drive
       - ./ListaNegra.txt:/app/ListaNegra.txt
       - ./UsuariosCadastrados.txt:/app/UsuariosCadastrados.txt
       - ./WikiContent.html:/app/WikiContent.html
+      - ./.backlog.txt:/app/.backlog.txt
       - ./appsettings.json:/app/appsettings.json
-    networks:
-      - homelab_net
-
-  nginx:
-    image: nginx:latest
-    container_name: stange_castle_nginx
-    restart: unless-stopped
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - app
     networks:
       - homelab_net
 
@@ -30,7 +23,7 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: stange_castle_tunnel
     restart: unless-stopped
-    command: tunnel --no-autoupdate run --token 350f14a0-545f-453b-b122-8f1a97fc32c5
+    command: tunnel --no-autoupdate run --token eyJhIjoiZTFiYzI3NDY0OGRiOTEzZDk1MjIzOWQ0NTcyYjYwNjMiLCJ0IjoiMzUwZjE0YTAtNTQ1Zi00NTNiLWIxMjItOGYxYTk3ZmMzMmM1IiwicyI6Ik5tVTBObUZqT0dZdE56azNPQzAwWkRsakxUa3lZVFl0TlRnek16a3pNRGt3TlRVNSJ9
     networks:
       - homelab_net
 

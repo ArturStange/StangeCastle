@@ -91,7 +91,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseForwardedHeaders();
 app.UseHttpsRedirection(); // Redireciona tudo para HTTPS (segurança)
-app.UseStaticFiles();      // <--- ESTA É A LINHA QUE FAZ O CSS VOLTAR A FUNCIONAR
+app.UseStaticFiles();      
 
 app.UseRouting();
 app.UseSession();

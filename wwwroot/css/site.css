@@ -327,7 +327,7 @@ header {
 
 .input-terminal {
     background-color: var(--preto);
-    color: var(--ciano);
+    color: var(--offwhite);
     border: 1px solid var(--ciano-escuro);
     padding: 10px;
     width: 80%;
@@ -399,4 +399,67 @@ header {
     right: 0;
     background-image: url('/imgs/SC_Pilar_Background.png'); /* A mesma imagem... */
     transform: scaleX(-1); /* ...mas espelhada! */
+}
+
+/* =========================================
+   MAPA INTERATIVO (WIKI)
+   ========================================= */
+.map-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 30px auto;
+    border: 2px solid var(--vinho);
+    border-radius: 5px;
+    box-shadow: 0 0 20px var(--vinho-transparente);
+}
+
+.map-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.map-point {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: var(--ciano);
+    border: 2px solid var(--preto);
+    border-radius: 50%;
+    transform: translate(-50%, -50%); /* Centraliza o clique exato */
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--ciano);
+    transition: all 0.2s ease-in-out;
+    z-index: 10;
+}
+
+.map-point:hover {
+    background-color: var(--roxo-neon);
+    box-shadow: 0 0 20px var(--roxo-neon);
+    transform: translate(-50%, -50%) scale(1.5);
+}
+
+/* Tooltip (O balão flutuante com o nome do local) */
+.map-point::after {
+    content: attr(data-name);
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: var(--offwhite);
+    padding: 4px 10px;
+    border: 1px solid var(--ciano-escuro);
+    border-radius: 3px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    text-shadow: none;
+}
+
+.map-point:hover::after {
+    opacity: 1;
 }

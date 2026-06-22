@@ -1,67 +1,352 @@
 @{
     ViewData["Title"] = "Biblioteca - Wiki Mythos";
+    bool isAdmin = ViewBag.IsAdmin ?? false;
 }
 
 <div>
-    <button id="toggleSidebar" class="btn pulse btn-fixed" style="margin-top: 0;">
-        [ >_ ALTERNAR MENU_WIKI ]
-    </button>
+    <div style="position: fixed; bottom: 30px; right: 30px; z-index: 999; display: flex; gap: 10px; flex-direction: column; align-items: flex-end;">
+        
+        @if (isAdmin)
+        {
+            <div id="adminToolbar" style="display: none; background-color: rgba(0,0,0,0.9); border: 1px solid var(--roxo-neon); padding: 10px; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                <button onclick="inserirTopico()" class="btn" style="margin: 0; font-size: 0.9rem;">[ + TÓPICO (H2) ]</button>
+                <button onclick="inserirSubtopico()" class="btn" style="margin: 0; font-size: 0.9rem;">[ + SUBTÓPICO (H3) ]</button>
+                <button onclick="inserirTitulo()" class="btn" style="margin: 0; font-size: 0.9rem;">[ + TÍTULO (H4) ]</button>
+                <button onclick="inserirSubtitulo()" class="btn" style="margin: 0; font-size: 0.9rem;">[ + SUBTÍTULO (H5) ]</button>
+                <button onclick="abrirModalImagem(false)" class="btn" style="margin: 0; font-size: 0.9rem;">[ + IMAGEM ]</button>
+                <button onclick="abrirModalImagem(true)" class="btn pulse" style="margin: 0; font-size: 0.9rem; color: var(--ciano); border-color: var(--ciano);">[ + MAPA INTERATIVO ]</button>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button id="btnEditMode" class="btn pulse" style="margin-top: 0; background-color: rgba(0,0,0,0.8);">[ MODO EDIÇÃO ]</button>
+                <button id="btnSaveWiki" class="btn pulse" style="margin-top: 0; display: none; background-color: rgba(0,0,0,0.8); color: var(--roxo-neon); border-color: var(--roxo-neon);">[ SALVAR PERGAMINHOS ]</button>
+            </div>
+        }
+        
+        <button id="toggleSidebar" class="btn pulse" style="margin-top: 0; background-color: rgba(0,0,0,0.8);">[ >_ MENU_WIKI ]</button>
+    </div>
 
     <div class="wiki-wrapper">
-        
         <aside class="wiki-sidebar" id="sidebar">
-            <h3 class="glow-small" style="margin-top: 0; border-bottom: 1px solid var(--ciano-escuro); padding-bottom: 10px;">
-                > Diretórios
-            </h3>
-            <ul class="wiki-nav-list">
-                <li><a href="#introducao">Introdução</a></li>
-                <li><a href="#mecanicas">Mecânicas</a></li>
-                <li><a href="#continente">Continente</a></li>
-                <li><a href="#reinos">Reinos</a></li>
-                <li><a href="#personagens">Personagens</a></li>
-                <li><a href="#dungeons">Dungeons</a></li>
-                <li><a href="#especies">Espécies Conscientes</a></li>
-                <li><a href="#deuses">Deuses</a></li>
-                <li><a href="#magias">Magias e Rituais</a></li>
-                <li><a href="#monstros">Monstros</a></li>
-                <li><a href="#itens">Itens</a></li>
-            </ul>
+            <h3 class="glow-small" style="margin-top: 0; border-bottom: 1px solid var(--ciano-escuro); padding-bottom: 10px;">> Diretórios</h3>
+            <ul class="wiki-nav-list" id="dynamic-sidebar"></ul>
         </aside>
 
-        <article class="wiki-content"> 
+        <article class="wiki-content" id="wiki-editor"> 
             @Html.Raw(ViewBag.WikiContent)
         </article>
-
     </div>
 </div>
 
+@if (isAdmin)
+{
+    <div id="modalTreasure" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+        <div style="background: var(--preto); border: 2px solid var(--ciano); padding: 20px; width: 80%; max-width: 800px; max-height: 80vh; overflow-y: auto;">
+            <h2 class="glow-small" style="margin-top: 0;">> O Cofre do Mestre</h2>
+            <p style="color: var(--lilas);">Selecione uma imagem do seu Drive para injetar nos pergaminhos:</p>
+            
+            <div id="listaImagens" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px;">
+                </div>
+
+            <div style="margin-top: 20px; text-align: right; border-top: 1px solid var(--ciano-escuro); padding-top: 15px;">
+                <button onclick="fecharModalImagem()" class="btn" style="border-color: var(--vinho); color: var(--vinho);">[ CANCELAR ]</button>
+            </div>
+        </div>
+    </div>
+}
+
 @section Scripts {
     <script>
-        // Funcionalidade de abrir/fechar sidebar
+        // ==========================================
+        // 1. GERADOR AUTOMÁTICO DA SIDEBAR
+        // ==========================================
+        function construirSidebar() {
+            const sidebar = document.getElementById('dynamic-sidebar');
+            sidebar.innerHTML = ''; 
+            
+            const sections = document.querySelectorAll('.wiki-content .wiki-section');
+
+            sections.forEach(sec => {
+                let id = sec.getAttribute('id');
+                if(!id) {
+                    id = 'sec_' + Math.random().toString(36).substr(2, 9);
+                    sec.setAttribute('id', id);
+                }
+
+                // AGORA LÊ H1, H2, H3, H4 E H5
+                const titleTag = sec.querySelector('h1, h2, h3, h4, h5');
+                if(!titleTag) return; 
+                
+                let titleText = titleTag.innerText.replace('>', '').replace('->', '').trim();
+
+                const li = document.createElement('li');
+                
+                // HIERARQUIA VISUAL (Escadinha)
+                if(titleTag.tagName === 'H3') {
+                    li.style.paddingLeft = '15px';
+                    li.style.borderLeft = '1px dashed var(--vinho)';
+                    li.style.fontSize = '1.1rem';
+                } else if(titleTag.tagName === 'H4') {
+                    li.style.paddingLeft = '30px';
+                    li.style.borderLeft = '1px dashed var(--roxo-neon)';
+                    li.style.fontSize = '1rem';
+                } else if(titleTag.tagName === 'H5') {
+                    li.style.paddingLeft = '45px';
+                    li.style.borderLeft = '1px dashed var(--ciano-escuro)';
+                    li.style.fontSize = '0.9rem';
+                    li.style.opacity = '0.8';
+                }
+
+                li.innerHTML = `<a href="#${id}">${titleText}</a>`;
+                sidebar.appendChild(li);
+            });
+
+            atualizarScrollSpy();
+}
+
+        // ==========================================
+        // 2. LÓGICA DE EDIÇÃO E FERRAMENTAS DO MESTRE
+        // ==========================================
+        @if (isAdmin)
+        {
+            <text>
+            const btnEdit = document.getElementById('btnEditMode');
+            const btnSave = document.getElementById('btnSaveWiki');
+            const editor = document.getElementById('wiki-editor');
+            const toolbar = document.getElementById('adminToolbar');
+
+            // Ativar/Desativar Edição
+            btnEdit.addEventListener('click', () => {
+                if (editor.isContentEditable) {
+                    // Desliga
+                    editor.contentEditable = "false";
+                    editor.style.outline = "none";
+                    editor.style.backgroundColor = "transparent";
+                    btnEdit.innerText = "[ MODO EDIÇÃO ]";
+                    btnSave.style.display = "none";
+                    toolbar.style.display = "none";
+                    construirSidebar();
+                } else {
+                    // Liga
+                    editor.contentEditable = "true";
+                    editor.style.outline = "2px dashed var(--roxo-neon)";
+                    editor.style.backgroundColor = "rgba(163, 59, 255, 0.05)";
+                    editor.focus();
+                    btnEdit.innerText = "[ CANCELAR ]";
+                    btnSave.style.display = "block";
+                    toolbar.style.display = "flex";
+                }
+            });
+
+            // Salvar no Servidor
+            btnSave.addEventListener('click', async () => {
+                btnSave.innerText = "[ SALVANDO... ]";
+                const conteudoHtml = editor.innerHTML;
+
+                const response = await fetch('/Biblioteca/SalvarInline', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ Conteudo: conteudoHtml })
+                });
+
+                if (response.ok) {
+                    editor.contentEditable = "false";
+                    editor.style.outline = "none";
+                    editor.style.backgroundColor = "transparent";
+                    btnEdit.innerText = "[ MODO EDIÇÃO ]";
+                    btnSave.style.display = "none";
+                    toolbar.style.display = "none";
+                    construirSidebar();
+                    alert('Os pergaminhos foram reescritos e guardados.');
+                } else {
+                    alert('Erro ao salvar. Tente novamente.');
+                    btnSave.innerText = "[ SALVAR PERGAMINHOS ]";
+                }
+            });
+
+            // Funções da Toolbar
+            function gerarIdUnico() { return 'sec_' + Math.random().toString(36).substr(2, 9); }
+
+            function inserirTopico() {
+                const html = `<section id="${gerarIdUnico()}" class="wiki-section" style="margin-top: 40px;"><h2 class="glow-small">> Novo Tópico</h2><p>Escreva aqui...</p></section>`;
+                document.execCommand('insertHTML', false, html);
+            }
+
+            function inserirSubtopico() {
+                const html = `<section id="${gerarIdUnico()}" class="wiki-section" style="margin-top: 20px;"><h3 style="color: var(--lilas);">-> Novo Subtópico</h3><p>Detalhes...</p></section>`;
+                document.execCommand('insertHTML', false, html);
+            }
+
+            function inserirTitulo() {
+                const html = `<section id="${gerarIdUnico()}" class="wiki-section" style="margin-top: 15px;"><h4 style="color: var(--offwhite); font-size: 1.4rem; text-decoration: underline var(--ciano-escuro); margin-bottom: 10px;">> Título</h4><p>Texto...</p></section>`;
+                document.execCommand('insertHTML', false, html);
+            }
+
+            function inserirSubtitulo() {
+                const html = `<section id="${gerarIdUnico()}" class="wiki-section" style="margin-top: 5px;"><h5 style="color: var(--ciano); font-size: 1.2rem; margin-bottom: 5px;">- Subtítulo</h5><p>Texto...</p></section>`;
+                document.execCommand('insertHTML', false, html);
+            }
+
+           // -- Integração Stange Treasure (Imagens e Mapas) --
+            const modal = document.getElementById('modalTreasure');
+            const listaImagens = document.getElementById('listaImagens');
+            let isInsertingMap = false; // Flag para saber se é mapa ou imagem normal
+
+            async function abrirModalImagem(comoMapa) {
+                isInsertingMap = comoMapa;
+                editor.focus();
+                
+                listaImagens.innerHTML = '<p style="color: var(--ciano);">Acedendo ao cofre...</p>';
+                modal.style.display = 'flex';
+
+                const response = await fetch('/Biblioteca/ObterImagensTreasure');
+                const imagens = await response.json();
+
+                listaImagens.innerHTML = '';
+                if(imagens.length === 0) {
+                    listaImagens.innerHTML = '<p style="color: var(--vinho);">O cofre está vazio.</p>';
+                    return;
+                }
+
+                imagens.forEach(img => {
+                    const card = document.createElement('div');
+                    card.style.cssText = "border: 1px dashed var(--ciano-escuro); padding: 5px; text-align: center; cursor: pointer; transition: all 0.2s;";
+                    card.innerHTML = `<img src="${img.url}" style="width: 100%; height: 100px; object-fit: cover; margin-bottom: 5px;" /><span style="font-size: 0.7rem; color: var(--offwhite);">${img.nome}</span>`;
+
+                    card.onclick = () => {
+                        modal.style.display = 'none';
+                        if (isInsertingMap) {
+                            // Insere um Mapa Interativo
+                            const idMapa = gerarIdUnico();
+                            const mapHtml = `
+                            <div class="map-container" id="${idMapa}" contenteditable="false">
+                                <p style="text-align: center; color: var(--lilas); font-size: 0.8rem; margin: 5px;">[ MAPA: Clique no ponto para ser direcionado ao tópico relacionado. ]</p>
+                                <img src="${img.url}" class="map-image" alt="Mapa Interativo" />
+                            </div><br/>`;
+                            document.execCommand('insertHTML', false, mapHtml);
+                        } else {
+                            // Insere uma Imagem Normal
+                            const imgHtml = `<img src="${img.url}" alt="${img.nome}" style="max-width: 100%; border: 1px solid var(--ciano-escuro); border-radius: 5px; margin: 15px 0;" />`;
+                            document.execCommand('insertHTML', false, imgHtml);
+                        }
+                    };
+                    listaImagens.appendChild(card);
+                });
+            }
+
+            function fecharModalImagem() { modal.style.display = 'none'; }
+
+            // ==========================================
+            // LÓGICA DE CRIAÇÃO DOS PONTOS NO MAPA
+            // ==========================================
+            editor.addEventListener('click', function(e) {
+                // Se estiver no MODO DE EDIÇÃO e clicar numa imagem dentro do Mapa
+                if (editor.isContentEditable) {
+                    const mapContainer = e.target.closest('.map-container');
+                    if (mapContainer && e.target.tagName === 'IMG') {
+                        
+                        // Calcula a percentagem exata (X, Y) de onde clicou para ser responsivo
+                        const rect = e.target.getBoundingClientRect();
+                        const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
+                        const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
+
+                        const nomeLocal = prompt("Nome deste Local (ex: Capital de Pedra):");
+                        if(!nomeLocal) return;
+
+                        // Ajuda a listar os tópicos existentes
+                        const sections = Array.from(document.querySelectorAll('.wiki-section h2, .wiki-section h3, .wiki-section h4, .wiki-section h5'))
+                            .map(h => h.innerText.replace('>', '').replace('->', '').trim());
+                        const topicoAlvo = prompt(`Para qual tópico este ponto deve levar?\nExistem: ${sections.slice(0, 5).join(', ')}...`);
+
+                        // Descobre o ID do tópico alvo (tentando encontrar o nome na barra lateral)
+                        let targetId = "";
+                        const navLinks = document.querySelectorAll('.wiki-nav-list a');
+                        navLinks.forEach(link => {
+                            if (link.innerText.toLowerCase() === (topicoAlvo || "").toLowerCase().trim()) {
+                                targetId = link.getAttribute('href').replace('#', '');
+                            }
+                        });
+
+                        if (!targetId && topicoAlvo) {
+                            alert("Aviso: Tópico não encontrado exatamente com esse nome. O ponto foi criado, mas poderá não rolar a tela corretamente.");
+                        }
+
+                        // Injeta o Ponto (Marcador) no Mapa
+                        const point = document.createElement('div');
+                        point.className = 'map-point';
+                        point.style.left = xPercent + '%';
+                        point.style.top = yPercent + '%';
+                        point.setAttribute('data-name', nomeLocal);
+                        point.setAttribute('data-target', targetId || '');
+                        point.title = "Clique com botão direito para apagar este ponto";
+                        
+                        mapContainer.appendChild(point);
+                    }
+                }
+            });
+
+            // Permite apagar um ponto clicando com o botão direito nele (Apenas no Modo Edição)
+            editor.addEventListener('contextmenu', function(e) {
+                if (editor.isContentEditable && e.target.classList.contains('map-point')) {
+                    e.preventDefault(); // Impede o menu do navegador de abrir
+                    if (confirm(`Deseja apagar o ponto "${e.target.getAttribute('data-name')}"?`)) {
+                        e.target.remove();
+                    }
+                }
+            });
+
+            function fecharModalImagem() {
+                modal.style.display = 'none';
+            }
+            </text>
+        }
+        
+        // ==========================================
+        // VIAGEM RÁPIDA (CLICAR NO PONTO DO MAPA)
+        // ==========================================
+        document.getElementById('wiki-editor').addEventListener('click', function(e) {
+            // Só viaja se NÃO estiver no modo de edição
+            const isEditing = this.isContentEditable;
+            if (!isEditing && e.target.classList.contains('map-point')) {
+                const targetId = e.target.getAttribute('data-target');
+                if (targetId) {
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            }
+        });
+
+        // ==========================================
+        // 3. EVENTOS ORIGINAIS (Toggle e Scroll)
+        // ==========================================
         document.getElementById("toggleSidebar").addEventListener("click", function () {
             document.getElementById("sidebar").classList.toggle("collapsed");
         });
 
-        // Script opcional para destacar o link na sidebar conforme você rola a tela
-        const sections = document.querySelectorAll('.wiki-section');
-        const navLinks = document.querySelectorAll('.wiki-nav-list a');
+        function atualizarScrollSpy() {
+            const sections = document.querySelectorAll('.wiki-section');
+            const navLinks = document.querySelectorAll('.wiki-nav-list a');
 
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (pageYOffset >= (sectionTop - 150)) {
-                    current = section.getAttribute('id');
-                }
-            });
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= (sectionTop - 150)) {
+                        current = section.getAttribute('id');
+                    }
+                });
 
-            navLinks.forEach(a => {
-                a.classList.remove('active');
-                if (a.getAttribute('href').includes(current)) {
-                    a.classList.add('active');
-                }
+                navLinks.forEach(a => {
+                    a.classList.remove('active');
+                    if (a.getAttribute('href').includes(current)) {
+                        a.classList.add('active');
+                    }
+                });
             });
-        });
+        }
+
+        construirSidebar();
     </script>
 }

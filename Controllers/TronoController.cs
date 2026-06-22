@@ -20,7 +20,6 @@ namespace SeuProjeto.Controllers
         // Caminhos dinâmicos
         private string CaminhoListaNegra => Path.Combine(Directory.GetCurrentDirectory(), "ListaNegra.txt");
         private string CaminhoCadastrados => Path.Combine(Directory.GetCurrentDirectory(), "UsuariosCadastrados.txt"); // NOVO
-        private string CaminhoWiki => Path.Combine(Directory.GetCurrentDirectory(), "WikiContent.html");
         public IActionResult Index()
         {
             if (HttpContext.Session.GetString("TronoDesbloqueado") != "sim")
@@ -37,10 +36,6 @@ namespace SeuProjeto.Controllers
             ViewBag.RegisteredUsers = System.IO.File.Exists(CaminhoCadastrados)
                 ? System.IO.File.ReadAllLines(CaminhoCadastrados).Where(e => !string.IsNullOrWhiteSpace(e)).ToList()
                 : new List<string>();
-
-            // LÊ O CONTEÚDO ATUAL DA WIKI PARA O EDITOR
-            ViewBag.WikiContent = System.IO.File.Exists(CaminhoWiki) 
-                ? System.IO.File.ReadAllText(CaminhoWiki) : "";
 
             return View();
         }
@@ -66,14 +61,6 @@ namespace SeuProjeto.Controllers
                 var novaLista = linhas.Where(l => l.Trim().ToLower() != emailDesbanir.Trim().ToLower()).ToArray();
                 System.IO.File.WriteAllLines(CaminhoListaNegra, novaLista);
             }
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        public IActionResult SalvarWiki(string conteudoWiki)
-        {
-            // Guarda tudo o que escreveu na textarea diretamente no ficheiro
-            System.IO.File.WriteAllText(CaminhoWiki, conteudoWiki ?? "");
             return RedirectToAction("Index");
         }
 

@@ -69,7 +69,7 @@
         </div>
     </div>
 
-    <div class="trono-panel">
+    <div class="trono-panel trono-full-width">
         <h3 class="trono-panel-title">
             <span>>_ Stange_Treasure.exe (Drive)</span>
             <span style="color: var(--ciano);">[ SISTEMA DE ARQUIVOS ]</span>
@@ -158,26 +158,6 @@
 
         </div>
     </div>
-
-<div class="trono-panel trono-full-width">
-        <h3 class="trono-panel-title">
-            <span>>_ Editar_Pergaminhos.exe (Wiki CMS)</span>
-        </h3>
-        <p style="color: var(--lilas); margin-bottom: 15px;">
-            Atenção: Utilize tags HTML básicas para formatar. Exemplo: <code>&lt;section id="continente" class="wiki-section"&gt; ... &lt;/section&gt;</code> para que a barra lateral funcione.
-        </p>
-        
-        <form asp-action="SalvarWiki" method="post">
-            <textarea name="conteudoWiki" class="input-terminal" style="width: 100%; height: 400px; resize: vertical; text-align: left; font-family: monospace; white-space: pre-wrap; padding: 15px;" placeholder="Escreva a lore de Mythos aqui...">@ViewBag.WikiContent</textarea>
-            
-            <div style="text-align: right; margin-top: 10px;">
-                <button type="submit" class="btn pulse" style="color: var(--roxo-neon); border-color: var(--roxo-neon); font-size: 1.2rem;">
-                    [ GUARDAR PERGAMINHOS ]
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
 
 @section Scripts {
     <script>

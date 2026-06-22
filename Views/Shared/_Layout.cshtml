@@ -12,29 +12,41 @@
     <div class="pilastra direita"></div>
 
     <div class="terminal-container">
-        <header>
-            <nav class="top-nav">
-                <span>root@stangecastle:~# </span>
-                <a asp-controller="Home" asp-action="Index">/cd /salão_principal</a>
+        <header style="margin-bottom: 30px;">
+            <nav class="top-nav" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                <span style="color: var(--offwhite); font-weight: bold;">root@stangecastle:~# </span>
+                
+                <!-- Bloco Público -->
+                <div style="border: 1px solid var(--ciano-escuro); padding: 5px 15px; border-radius: 4px; background-color: rgba(61, 242, 255, 0.05);">
+                    <a asp-controller="Home" asp-action="Index">/cd /salão_principal</a>
+                </div>
                 
                 @if (User.Identity.IsAuthenticated)
                 {
-                    <span> | </span>
-                    <a asp-controller="Biblioteca" asp-action="Index">/cd /biblioteca</a>
+                    <!-- Bloco do Utilizador -->
+                    <div style="border: 1px solid var(--ciano-escuro); padding: 5px 15px; border-radius: 4px; background-color: rgba(61, 242, 255, 0.05);">
+                        <a asp-controller="Biblioteca" asp-action="Index">/cd /biblioteca</a>
+                    </div>
                     
                     @if (User.IsInRole("Admin"))
                     {
-                        <span> | </span>
-                        <a asp-controller="Trono" asp-action="Index">/cd /sala_do_trono</a>
+                        <!-- Bloco do Mestre (Destacado em Roxo Neon) -->
+                        <div style="border: 1px solid var(--roxo-neon); padding: 5px 15px; border-radius: 4px; background-color: rgba(163, 59, 255, 0.1);">
+                            <a asp-controller="Trono" asp-action="Index" style="color: var(--roxo-neon);">/cd /sala_do_trono</a>
+                        </div>
                     }
                     
-                    <span> | </span>
-                    <a asp-controller="Autenticacao" asp-action="Logout" style="color: var(--vinho);">[Logout]</a>
+                    <!-- Bloco de Saída (Destacado em Vinho) -->
+                    <div style="border: 1px solid var(--vinho); padding: 5px 15px; border-radius: 4px; background-color: rgba(122, 8, 49, 0.2); margin-left: auto;">
+                        <a asp-controller="Autenticacao" asp-action="Logout" style="color: var(--vinho);">[Logout]</a>
+                    </div>
                 }
                 else
                 {
-                    <span> | </span>
-                    <a asp-controller="Autenticacao" asp-action="LoginGoogle" style="color: var(--lilas);">[Login Google]</a>
+                    <!-- Bloco de Entrada -->
+                    <div style="border: 1px solid var(--lilas); padding: 5px 15px; border-radius: 4px; background-color: rgba(192, 123, 255, 0.1); margin-left: auto;">
+                        <a asp-controller="Autenticacao" asp-action="LoginGoogle" style="color: var(--lilas);">[Login Google]</a>
+                    </div>
                 }
             </nav>
         </header>
