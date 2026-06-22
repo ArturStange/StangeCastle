@@ -84,6 +84,8 @@ namespace SeuProjeto.Controllers
 
         // 3. UPLOAD DE FICHEIRO (Atualizado para receber a pasta de destino)
         [HttpPost]
+        [RequestSizeLimit(524288000)] // Permite até 500MB
+        [RequestFormLimits(MultipartBodyLengthLimit = 524288000)]
         public async Task<IActionResult> Upload(string pathAtual, string destinoUpload, List<IFormFile> arquivosUpload)
         {
             if (TronoBloqueado()) return RedirectToAction("Portao", "Trono");
@@ -223,6 +225,55 @@ namespace SeuProjeto.Controllers
             System.IO.File.Delete(tempZipPath);
 
             return File(fileBytes, "application/zip", $"StangeTreasure_Backup_{DateTime.Now:yyyyMMdd_HHmm}.zip");
+        }
+
+        // ==========================================
+        // DOWNLOAD EM LOTE E PASTAS
+        // ==========================================
+        
+        [HttpPost]
+        public IActionResult BaixarLote(string pathAtual, List<string> itensSelecionados)
+        {
+            if (TronoBloqueado()) return Unauthorized();
+            if (itensSelecionados == null || !itensSelecionados.Any()) return RedirectToAction("Index", new { path = pathAtual });
+
+            string tempZipPath = Path.Combine(Directory.GetCurrentDirectory(), $"Lote_{DateTime.Now:HHmmss}.zip");
+            
+            if (System.IO.File.Exists(tempZipPath)) System.IO.File.Delete(tempZipPath);
+
+            using (var zip = ZipFile.Open(tempZipPath, ZipArchiveMode.Create))
+            {
+                foreach (var item in itensSelecionados)
+                {
+                    var caminhoCompleto = ObterCaminhoSeguro(Path.Combine(pathAtual ?? "", item));
+                    
+                    if (System.IO.File.Exists(caminhoCompleto))
+                    {
+                        zip.CreateEntryFromFile(caminhoCompleto, item);
+                    }
+                    else if (Directory.Exists(caminhoCompleto))
+                    {
+                        AdicionarPastaAoZip(zip, caminhoCompleto, item);
+                    }
+                }
+            }
+
+            byte[] fileBytes = System.IO.File.ReadAllBytes(tempZipPath);
+            System.IO.File.Delete(tempZipPath);
+
+            return File(fileBytes, "application/zip", $"Treasure_Lote_{DateTime.Now:yyyyMMdd_HHmm}.zip");
+        }
+
+        private void AdicionarPastaAoZip(ZipArchive zip, string caminhoPasta, string caminhoBaseZip)
+        {
+            foreach (var arquivo in Directory.GetFiles(caminhoPasta))
+            {
+                zip.CreateEntryFromFile(arquivo, Path.Combine(caminhoBaseZip, Path.GetFileName(arquivo)));
+            }
+            foreach (var subPasta in Directory.GetDirectories(caminhoPasta))
+            {
+                AdicionarPastaAoZip(zip, subPasta, Path.Combine(caminhoBaseZip, Path.GetFileName(subPasta)));
+            }
         }
     }
 }

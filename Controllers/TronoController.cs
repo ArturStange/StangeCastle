@@ -140,12 +140,14 @@ namespace SeuProjeto.Controllers
             if (HttpContext.Session.GetString("TronoDesbloqueado") != "sim") return Unauthorized();
 
             // 1. LEITURA DE CPU (Nativo para Linux: Arch/Debian)
+// 1. LEITURA DE CPU E TEMPERATURA
             double usoCpu = 0;
+            string cpuTemp = "N/A";
             try
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 {
-                    // Função local para ler os ticks atuais do processador
+                    // Lê Uso de CPU
                     (long idle, long total) LerProcStat()
                     {
                         var linhaCpu = System.IO.File.ReadLines("/proc/stat").First();
@@ -157,12 +159,22 @@ namespace SeuProjeto.Controllers
                     }
 
                     var inicio = LerProcStat();
-                    await Task.Delay(200); // Espera 200ms para medir a variação
+                    await Task.Delay(200); 
                     var fim = LerProcStat();
 
                     long diffTotal = fim.total - inicio.total;
                     long diffIdle = fim.idle - inicio.idle;
                     usoCpu = diffTotal > 0 ? (1.0 - ((double)diffIdle / diffTotal)) * 100 : 0;
+
+                    // LÊ TEMPERATURA (Maioria das distros Linux guarda aqui em miligraus)
+                    if (System.IO.File.Exists("/sys/class/thermal/thermal_zone0/temp"))
+                    {
+                        string tempStr = System.IO.File.ReadAllText("/sys/class/thermal/thermal_zone0/temp").Trim();
+                        if (double.TryParse(tempStr, out double tempMilli))
+                        {
+                            cpuTemp = Math.Round(tempMilli / 1000.0, 1) + " °C";
+                        }
+                    }
                 }
             }
             catch { usoCpu = -1; /* Caso não consiga ler */ }
@@ -214,6 +226,7 @@ namespace SeuProjeto.Controllers
                 uptime = $"{uptime.Days}d {uptime.Hours}h {uptime.Minutes}m",
                 cpuCores = Environment.ProcessorCount,
                 cpuUso = Math.Round(usoCpu, 1), // Envia o uso da CPU arredondado para 1 casa decimal
+                cpuTemp = cpuTemp,
                 ramTotal = Math.Round(totalRamGB, 2),
                 ramApp = appRamUsageMB,
                 discoLivre = Math.Round(livreDiscoGB, 2),

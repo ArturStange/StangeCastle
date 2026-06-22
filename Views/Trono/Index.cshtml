@@ -33,13 +33,20 @@
                     <span style="color: var(--ciano);"><span id="hw-cpuuso">...</span> %</span>
                 </p>
 
-                <div style="width: 100%; background-color: rgba(0,0,0,0.5); border: 1px solid var(--ciano-escuro); height: 6px; margin-top: 2px; margin-bottom: 8px;">
+                <!-- Nova Barra Multi-cor para CPU -->
+                <div style="width: 100%; background-color: rgba(0,0,0,0.5); border: 1px solid var(--ciano-escuro); height: 8px; margin-top: 2px; margin-bottom: 8px; position: relative;">
                     <div id="hw-barracpu" style="width: 0%; background-color: var(--ciano); height: 100%; transition: width 0.5s;"></div>
                 </div>
 
                 <p style="margin: 8px 0; display: flex; justify-content: space-between;">
+                    <span style="color: var(--lilas);">CPU_TEMP:</span> <span style="color: var(--roxo-neon); font-weight: bold;" id="hw-cputemp">...</span>
+                </p>
+                <p style="margin: 8px 0; display: flex; justify-content: space-between;">
                     <span style="color: var(--lilas);">CPU_CORES:</span> <span style="color: var(--offwhite);"><span id="hw-cpu">...</span> Lógicos</span>
                 </p>
+                
+                <div style="border-top: 1px dashed var(--vinho-escuro); margin: 10px 0;"></div>
+                
                 <p style="margin: 8px 0; display: flex; justify-content: space-between;">
                     <span style="color: var(--lilas);">RAM_SERVIDOR:</span> <span style="color: var(--offwhite);"><span id="hw-ramtotal">...</span> GB</span>
                 </p>
@@ -62,7 +69,7 @@
                     <span style="color: var(--offwhite);">Livre: <span style="color: var(--ciano);" id="hw-discolivre">...</span> GB / <span id="hw-discototal">...</span> GB</span>
                 </p>
                 
-                <div style="width: 100%; background-color: rgba(0,0,0,0.5); border: 1px solid var(--vinho-escuro); height: 10px; margin-top: 5px;">
+                <div style="width: 100%; background-color: rgba(0,0,0,0.5); border: 1px solid var(--vinho-escuro); height: 8px; margin-top: 5px;">
                     <div id="hw-barradisco" style="width: 0%; background-color: var(--vinho-leve); height: 100%; transition: width 0.5s;"></div>
                 </div>
             </div>
@@ -163,15 +170,22 @@
     <script>
         function atualizarMonitor() {
             fetch('/Trono/GetMetricasHardware')
+            // ... dentro de fetch('/Trono/GetMetricasHardware')
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('status-monitor').innerText = "[ ONLINE - TEMPO REAL ]";
                     document.getElementById('hw-os').innerText = data.os;
                     document.getElementById('hw-uptime').innerText = data.uptime;
                     
-                    // Atualiza o texto e a barra da CPU
                     document.getElementById('hw-cpuuso').innerText = data.cpuUso;
-                    document.getElementById('hw-barracpu').style.width = data.cpuUso + "%";
+                    document.getElementById('hw-cputemp').innerText = data.cpuTemp; // Adicione esta linha
+                    
+                    const barraCpu = document.getElementById('hw-barracpu');
+                    barraCpu.style.width = data.cpuUso + "%";
+                    // Muda a cor da barra dependendo do uso (hack vibe)
+                    if(data.cpuUso > 85) barraCpu.style.backgroundColor = "var(--vinho)";
+                    else if(data.cpuUso > 60) barraCpu.style.backgroundColor = "var(--roxo-neon)";
+                    else barraCpu.style.backgroundColor = "var(--ciano)";
                     
                     document.getElementById('hw-cpu').innerText = data.cpuCores;
                     document.getElementById('hw-ramtotal').innerText = data.ramTotal;

@@ -9,6 +9,13 @@ services:
       - "4233:4233"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     volumes:
       - ./StangeTreasure_Drive:/app/StangeTreasure_Drive
       - ./ListaNegra.txt:/app/ListaNegra.txt
@@ -30,3 +37,4 @@ services:
 networks:
   homelab_net:
     driver: bridge
+  
