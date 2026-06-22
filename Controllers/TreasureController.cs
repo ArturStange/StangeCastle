@@ -82,6 +82,49 @@ namespace SeuProjeto.Controllers
             return RedirectToAction("Index", new { path = pathAtual });
         }
 
+        // ==========================================
+        // CRIAR NOVOS ARQUIVOS DIRETO NO DRIVE
+        // ==========================================
+        [HttpPost]
+        public IActionResult CriarArquivo(string pathAtual, string nomeArquivo, string tipo)
+        {
+            if (TronoBloqueado()) return Unauthorized();
+            if (string.IsNullOrWhiteSpace(nomeArquivo)) return RedirectToAction("Index", new { path = pathAtual });
+
+            // Garante que o nome tenha a extensão correta
+            if (!nomeArquivo.EndsWith(tipo)) nomeArquivo += tipo;
+
+            string caminhoFinal = ObterCaminhoSeguro(Path.Combine(pathAtual ?? "", nomeArquivo));
+
+            if (System.IO.File.Exists(caminhoFinal))
+            {
+                ViewBag.Erro = "Um pergaminho com esse nome já existe nestas terras!";
+                return RedirectToAction("Index", new { path = pathAtual });
+            }
+
+            if (tipo == ".txt" || tipo == ".md")
+            {
+                // Arquivos de texto simples podem ser criados do zero
+                System.IO.File.WriteAllText(caminhoFinal, "");
+            }
+            else if (tipo == ".docx")
+            {
+                // Arquivos complexos usam o Molde
+                string modeloPath = ObterCaminhoSeguro("Template.docx");
+                if (System.IO.File.Exists(modeloPath))
+                {
+                    System.IO.File.Copy(modeloPath, caminhoFinal);
+                }
+                else
+                {
+                    ViewBag.Erro = "Erro: O arquivo 'Template.docx' não foi encontrado na raiz do seu Drive. Faça o upload de um molde primeiro!";
+                    return RedirectToAction("Index", new { path = pathAtual });
+                }
+            }
+
+            return RedirectToAction("Index", new { path = pathAtual });
+        }
+
         // 3. UPLOAD DE FICHEIRO (Atualizado para receber a pasta de destino)
         [HttpPost]
         [RequestSizeLimit(524288000)] // Permite até 500MB

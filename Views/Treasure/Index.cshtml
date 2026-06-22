@@ -27,13 +27,25 @@
     <span style="color: var(--ciano);">root / @(string.IsNullOrEmpty(pathAtual) ? "" : pathAtual.Replace("\\", " / "))</span>
 </div>
 
-<div class="trono-grid" style="margin-bottom: 20px;">
     <div class="trono-panel" style="padding: 15px;">
         <h4 style="color: var(--offwhite); margin-top:0;">> Criar Diretório Aqui</h4>
         <form asp-action="CriarPasta" method="post" style="display: flex; gap: 10px;">
             <input type="hidden" name="pathAtual" value="@pathAtual" />
             <input type="text" name="nomePasta" class="input-terminal" style="margin:0; padding:5px; flex-grow:1;" placeholder="Nome da pasta..." required />
             <button type="submit" class="btn" style="margin:0; border-color: var(--ciano);">[CRIAR]</button>
+        </form>
+    </div>
+
+    <div class="trono-panel" style="padding: 15px;">
+        <h4 style="color: var(--offwhite); margin-top:0;">> Forjar Pergaminho</h4>
+        <form asp-action="CriarArquivo" method="post" style="display: flex; gap: 10px;">
+            <input type="hidden" name="pathAtual" value="@pathAtual" />
+            <input type="text" name="nomeArquivo" class="input-terminal" style="margin:0; padding:5px; flex-grow:1;" placeholder="Nome do arquivo..." required />
+            <select name="tipo" class="input-terminal" style="margin:0; padding:2px; height: 32px; border-color: var(--lilas);">
+                <option value=".docx">Docs (.docx)</option>
+                <option value=".txt">Texto (.txt)</option>
+            </select>
+            <button type="submit" class="btn" style="margin:0; border-color: var(--lilas); color: var(--lilas);">[ FORJAR ]</button>
         </form>
     </div>
 
@@ -65,7 +77,6 @@
         </div>
 
     </div>
-</div>
 
 <form asp-action="BaixarLote" method="post" id="formLote">
     <input type="hidden" name="pathAtual" value="@pathAtual" />
@@ -131,6 +142,7 @@
                     string ext = System.IO.Path.GetExtension(arquivo).ToLower();
                     bool isImagem = ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif" || ext == ".webp";
                     bool isTexto = ext == ".txt" || ext == ".md" || ext == ".html" || ext == ".json";
+                    bool isOffice = ext == ".docx" || ext == ".doc" || ext == ".xlsx" || ext == ".xls" || ext == ".pptx";
                     bool isPdf = ext == ".pdf";
                     bool isAudio = ext == ".mp3" || ext == ".wav" || ext == ".ogg";
                     bool isVideo = ext == ".mp4" || ext == ".mkv" || ext == ".webm";
@@ -159,7 +171,8 @@
 
                             @if (isImagem) { <a target="_blank" href="@Url.Action("ServirArquivo", new { pathAtual = pathAtual, nomeArquivo = arquivo, download = false })" style="color: var(--ciano);">[ VER ]</a> }
                             @if (isTexto) { <a asp-action="Editar" asp-route-pathAtual="@pathAtual" asp-route-nomeArquivo="@arquivo" style="color: var(--lilas);">[ EDITAR ]</a> }
-                            
+                            @if (isOffice) { <a target="_blank" asp-controller="Office" asp-action="Editor" asp-route-pathAtual="@pathAtual" asp-route-nomeArquivo="@arquivo" style="color: var(--roxo-neon); font-weight: bold;">[ ABRIR DOCS ]</a> }
+
                             <a href="@Url.Action("ServirArquivo", new { pathAtual = pathAtual, nomeArquivo = arquivo, download = true })" style="color: var(--offwhite);">[ DOWN ]</a>
                             <button type="button" onclick="confirmDelete('@arquivo', false)" style="background: none; border: 1px solid var(--vinho); color: var(--vinho); cursor: pointer; padding: 2px 5px;">[ DELETAR ]</button>
                         </td>
@@ -186,6 +199,15 @@
     <input type="hidden" name="nomeItem" id="moveNomeItem" />
     <input type="hidden" name="destinoItem" id="moveDestinoItem" />
 </form>
+
+<div class="trono-panel trono-full-width" style="margin-bottom: 20px;">
+    <h4 style="color: var(--lilas); margin-top:0;">> Diário do Mestre / Backlog</h4>
+    <form asp-action="SalvarBacklog" method="post" style="display: flex; gap: 10px;">
+        <input type="hidden" name="pathAtual" value="@pathAtual" />
+        <textarea name="conteudoBacklog" class="input-terminal" style="flex-grow: 1; height: 500px; resize: vertical; padding: 10px;" placeholder="Anotações rápidas, pendências...">@ViewBag.Backlog</textarea>
+        <button type="submit" class="btn" style="border-color: var(--lilas); color: var(--lilas);">[SALVAR]</button>
+    </form>
+</div>
 
 <script>
     // 1. Checkboxes em massa

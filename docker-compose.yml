@@ -34,6 +34,15 @@ services:
     networks:
       - homelab_net
 
+  onlyoffice:
+    image: onlyoffice/documentserver:latest
+    container_name: stange_castle_office
+    restart: unless-stopped
+    environment:
+      - JWT_ENABLED=false # Desligamos o JWT nesta primeira fase para facilitar a conexão
+    networks:
+      - homelab_net
+      
 networks:
   homelab_net:
     driver: bridge
