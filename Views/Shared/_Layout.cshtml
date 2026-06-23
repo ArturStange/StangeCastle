@@ -20,13 +20,15 @@
                 <div style="border: 1px solid var(--ciano-escuro); padding: 5px 15px; border-radius: 4px; background-color: rgba(61, 242, 255, 0.05);">
                     <a asp-controller="Home" asp-action="Index">/cd /salão_principal</a>
                 </div>
+
+                <div style="border: 1px solid var(--ciano-escuro); padding: 5px 15px; border-radius: 4px; background-color: rgba(61, 242, 255, 0.05);">
+                    <a asp-controller="Biblioteca" asp-action="Index">/cd /biblioteca</a>
+                </div>
                 
                 @if (User.Identity.IsAuthenticated)
                 {
                     <!-- Bloco do Utilizador -->
-                    <div style="border: 1px solid var(--ciano-escuro); padding: 5px 15px; border-radius: 4px; background-color: rgba(61, 242, 255, 0.05);">
-                        <a asp-controller="Biblioteca" asp-action="Index">/cd /biblioteca</a>
-                    </div>
+
                     
                     @if (User.IsInRole("Admin"))
                     {
