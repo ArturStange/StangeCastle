@@ -85,8 +85,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddSession(options => {
-    options.IdleTimeout = TimeSpan.FromMinutes(60); // A sessão do Trono expira em 60 min
+// Aumenta o tempo de vida do Login para 7 dias
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    options.SlidingExpiration = true;
+});
+
+// Aumenta a memória da Sala do Trono para 24 horas (Evita deslogar no meio do upload)
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(24);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });

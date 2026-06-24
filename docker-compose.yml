@@ -9,15 +9,15 @@ services:
       - "4233:4233"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
     volumes:
-      - ./StangeTreasure_Drive:/app/StangeTreasure_Drive
+      - /home/stange/TreasureDrive:/app/StangeTreasure_Drive
       - ./ListaNegra.txt:/app/ListaNegra.txt
       - ./UsuariosCadastrados.txt:/app/UsuariosCadastrados.txt
       - ./WikiContent.html:/app/WikiContent.html

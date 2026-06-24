@@ -213,13 +213,21 @@ namespace SeuProjeto.Controllers
                     string output = process.StandardOutput.ReadToEnd();
                     process.WaitForExit();
 
-                    var partes = output.Split(',');
-                    if (partes.Length >= 3) {
-                        gpuUso = partes[0].Trim(); vramUsada = partes[1].Trim(); vramTotal = partes[2].Trim();
+                    if (!string.IsNullOrWhiteSpace(output))
+                    {
+                        var partes = output.Split(',');
+                        if (partes.Length >= 3) {
+                            gpuUso = partes[0].Trim(); 
+                            vramUsada = partes[1].Trim(); 
+                            vramTotal = partes[2].Trim();
+                        }
                     }
                 }
             }
-            catch { gpuUso = "Off/Sem Driver"; }
+            catch (Exception)
+            {
+                // Sem gpu sem error. As variáveis continuarão como "N/A"
+            }
 
             return Json(new {
                 os = RuntimeInformation.OSDescription,

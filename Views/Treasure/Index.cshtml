@@ -233,66 +233,99 @@
         document.getElementById('formMove').submit();
     }
 
-// 4. Mágica do Upload Sequencial com Barra de Progresso
+    // 4. Mágica do Upload Fatiado (Chunked) com Barra de Progresso Real
+   // 4. Mágica do Upload Fatiado BLINDADO (Anti-524 e Auto-Heal)
     async function iniciarUpload() {
         const files1 = Array.from(document.getElementById('uploadFiles').files);
         const files2 = Array.from(document.getElementById('uploadDir').files);
-        const allFiles = [...files1, ...files2]; // Junta arquivos soltos e pastas
+        const allFiles = [...files1, ...files2]; 
 
         if(allFiles.length === 0) {
             alert('Selecione os ficheiros ou a pasta para injetar no cofre.');
             return;
         }
 
-        // Mostra a barra de progresso
         document.getElementById('progressContainer').style.display = 'block';
         const progressBar = document.getElementById('progressBar');
         const progressText = document.getElementById('progressText');
 
-        // Pega os destinos
         const pathAtual = document.querySelector('input[name="pathAtual"]').value;
         const destino = document.querySelector('select[name="destinoUpload"]').value;
 
-        let totalEnviado = 0;
-        const totalArquivos = allFiles.length;
+        const totalBytes = allFiles.reduce((acc, file) => acc + file.size, 0);
+        let bytesEnviadosGlobais = 0;
 
-        // Inicia o Loop de Envio (Um por Um)
-        for (let i = 0; i < totalArquivos; i++) {
+        // REDUZIDO PARA 2MB: Super leve para o HD e impossível de dar Timeout na Cloudflare
+        const chunkSize = 2 * 1024 * 1024; 
+
+        for (let i = 0; i < allFiles.length; i++) {
             const file = allFiles[i];
-            
-            // Atualiza o texto para mostrar qual arquivo está subindo agora
-            progressText.innerText = `Injetando: ${file.name} [ ${i + 1} / ${totalArquivos} ]`;
+            const totalChunks = Math.ceil(file.size / chunkSize) || 1; 
 
-            const formData = new FormData();
-            formData.append('pathAtual', pathAtual);
-            formData.append('destinoUpload', destino);
-            formData.append('arquivosUpload', file);
+            progressText.innerText = `Injetando: ${file.name} [ Arquivo ${i + 1} de ${allFiles.length} ]`;
 
-            try {
-                // Dispara o arquivo e espera a resposta
-                const response = await fetch('@Url.Action("Upload", "Treasure")', {
-                    method: 'POST',
-                    body: formData
-                });
+            for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+                
+                const start = chunkIndex * chunkSize;
+                const end = Math.min(start + chunkSize, file.size);
+                const chunk = file.slice(start, end);
 
-                if (response.ok) {
-                    totalEnviado++;
-                    // Atualiza a barra de progresso baseada na quantidade de arquivos
-                    const percentComplete = Math.round((totalEnviado / totalArquivos) * 100);
-                    progressBar.style.width = percentComplete + '%';
-                } else {
-                    console.error("Falha ao subir o arquivo: " + file.name);
+                const formData = new FormData();
+                formData.append('pathAtual', pathAtual);
+                formData.append('destinoUpload', destino);
+                formData.append('fileName', file.webkitRelativePath || file.name); 
+                formData.append('chunkIndex', chunkIndex);
+                formData.append('totalChunks', totalChunks);
+                formData.append('chunk', chunk);
+
+                // ==============================================
+                // SISTEMA AUTO-HEAL: 3 TENTATIVAS POR FATIA
+                // ==============================================
+                let tentativas = 3;
+                let chunkSucesso = false;
+
+                while (tentativas > 0 && !chunkSucesso) {
+                    try {
+                        const response = await fetch('@Url.Action("UploadChunk", "Treasure")', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (response.status === 401) throw new Error("SESSÃO EXPIRADA. Destranque a Sala do Trono.");
+                        if (!response.ok) throw new Error(`Erro do Servidor: ${response.status}`);
+
+                        // Se passou sem erros, marca como sucesso e avança a barra
+                        chunkSucesso = true;
+                        bytesEnviadosGlobais += chunk.size;
+                        const percentComplete = Math.round((bytesEnviadosGlobais / totalBytes) * 100);
+                        progressBar.style.width = percentComplete + '%';
+
+                        // Pausa de 200ms anti-DDoS da Cloudflare
+                        await new Promise(resolve => setTimeout(resolve, 200));
+
+                    } catch (e) {
+                        tentativas--;
+                        console.warn(`[!] Falha na fatia do arquivo ${file.name}. Tentativas restantes: ${tentativas}`);
+                        
+                        if (tentativas === 0) {
+                            console.error("Erro fatal irreparável: ", e);
+                            progressText.innerText = `[ ERRO ] ${e.message} - Ficheiro: ${file.name}`;
+                            progressBar.style.backgroundColor = "var(--vinho)";
+                            return; // Apenas para se as 3 tentativas falharem
+                        }
+                        
+                        // O Auto-Heal espera 2 segundos para a rede estabilizar antes de tentar de novo
+                        progressText.innerText = `[ RECONECTANDO... ] ${file.name}`;
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    }
                 }
-            } catch (e) {
-                console.error("Erro de conexão no arquivo: " + file.name);
             }
         }
 
-        // Finalização
+        // Finalização Glória
         progressText.innerText = '100% [Transferência Concluída! Recarregando...]';
         progressBar.style.backgroundColor = "var(--ciano)";
         
-        // Aguarda 1 segundo para você ver o 100% e recarrega a página
-        setTimeout(() => window.location.reload(), 1000);
+        setTimeout(() => window.location.reload(), 1500);
     }
 </script>

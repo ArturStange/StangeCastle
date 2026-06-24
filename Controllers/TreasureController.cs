@@ -150,6 +150,47 @@ namespace SeuProjeto.Controllers
             return RedirectToAction("Index", new { path = pathAtual });
         }
 
+        // ==========================================
+        // UPLOAD EM FATIAS (CHUNKED UPLOAD)
+        // ==========================================
+        [HttpPost]
+        [RequestSizeLimit(524288000)]
+        public async Task<IActionResult> UploadChunk(string pathAtual, string destinoUpload, string fileName, int chunkIndex, int totalChunks, IFormFile chunk)
+        {
+            if (TronoBloqueado()) return Unauthorized();
+
+            try
+            {
+                // Padroniza as barras de diretório para o Docker (Linux) entender perfeitamente
+                fileName = fileName.Replace("\\", "/");
+                
+                string caminhoFinal = ObterCaminhoSeguro(Path.Combine(destinoUpload ?? pathAtual ?? "", fileName));
+
+                // A SOLUÇÃO MÁGICA (ERRO 500): Cria a estrutura de pastas automaticamente se não existir
+                string diretorioDestino = Path.GetDirectoryName(caminhoFinal);
+                if (!Directory.Exists(diretorioDestino))
+                {
+                    Directory.CreateDirectory(diretorioDestino);
+                }
+
+                // Se for a primeira fatia (0), Cria o arquivo. Se for as outras, Anexa (Append).
+                FileMode modo = chunkIndex == 0 ? FileMode.Create : FileMode.Append;
+
+                using (var stream = new FileStream(caminhoFinal, modo, FileAccess.Write, FileShare.None))
+                {
+                    await chunk.CopyToAsync(stream);
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                // Escreve o erro exato no terminal do servidor caso haja outra falha
+                Console.WriteLine($"\n[ERRO DE CHUNK] Arquivo: {fileName} | Erro: {ex.Message}\n");
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // 4. ELIMINAR (Ficheiro ou Pasta)
         [HttpPost]
         public IActionResult Deletar(string pathAtual, string nomeItem, bool isPasta)
