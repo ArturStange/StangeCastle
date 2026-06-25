@@ -17,25 +17,52 @@ namespace SeuProjeto.Controllers
         }
 
         // 1. O Editor Visual (A tela que você vê)
-        [Authorize(Roles = "Admin")]
-        public IActionResult Editor(string pathAtual, string nomeArquivo)
+        [Authorize] 
+        public IActionResult Editor(string pathAtual, string nomeArquivo, string acesso = "leitura", string senha = "")
         {
+            bool isAdmin = User.IsInRole("Admin");
+            string senhaExigida = "";
+
+            // LÊ O BANCO DE SENHAS
+            string caminhoSenhas = Path.Combine(BaseDrivePath, ".senhas.json");
+            if (System.IO.File.Exists(caminhoSenhas))
+            {
+                var senhasDict = JsonSerializer.Deserialize<Dictionary<string, string>>(System.IO.File.ReadAllText(caminhoSenhas));
+                string chave = Path.Combine(pathAtual ?? "", nomeArquivo).Replace("\\", "/");
+                
+                if (senhasDict != null && senhasDict.ContainsKey(chave))
+                {
+                    senhaExigida = senhasDict[chave];
+                }
+            }
+
+            // LÓGICA DE ACESSO
+            bool temSenhaCorreta = !string.IsNullOrEmpty(senhaExigida) && senha == senhaExigida;
+            bool documentoSemSenha = string.IsNullOrEmpty(senhaExigida);
+
+            // O Admin edita tudo. O convidado edita se tiver a senha. 
+            // Se o documento não tiver senha configurada, ninguém edita (apenas Admin).
+            bool podeEditar = isAdmin || temSenhaCorreta;
+
+            ViewBag.PodeEditar = podeEditar;
+            ViewBag.ModoOffice = podeEditar ? "edit" : "view";
+
+            // Pega o nome do usuário logado via Google para aparecer no cursor do OnlyOffice
+            ViewBag.UserName = User.Identity?.Name ?? "Explorador";
+
+            // Dados do Arquivo
             ViewBag.PathAtual = pathAtual ?? "";
             ViewBag.NomeArquivo = nomeArquivo;
             ViewBag.Extensao = Path.GetExtension(nomeArquivo).Replace(".", "").ToLower();
             
-            // Define se é documento de texto, planilha ou apresentação
             ViewBag.DocumentType = ViewBag.Extensao switch {
                 "xlsx" or "xls" or "csv" => "cell",
                 "pptx" or "ppt" => "slide",
                 _ => "word"
             };
 
-            // NOVO: Gera a chave única exigida pelo OnlyOffice para co-edição
-            var caminhoFisico = ObterCaminhoSeguro(pathAtual, nomeArquivo);
-            var fileInfo = new System.IO.FileInfo(caminhoFisico);
-            // Cria um Hash combinando o nome do ficheiro e a data da última modificação
-            ViewBag.DocumentKey = Math.Abs((nomeArquivo + fileInfo.LastWriteTime.Ticks).GetHashCode()).ToString();
+            // CHAVE ESTÁVEL: Garante que todos entrem na mesma "sala" de co-edição baseada no nome do arquivo
+            ViewBag.DocumentKey = Math.Abs((pathAtual + nomeArquivo).GetHashCode()).ToString();
 
             return View();
         }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using System.IO.Compression;
+using System.Text.Json;
 
 namespace SeuProjeto.Controllers
 {
@@ -358,6 +359,32 @@ namespace SeuProjeto.Controllers
             {
                 AdicionarPastaAoZip(zip, subPasta, Path.Combine(caminhoBaseZip, Path.GetFileName(subPasta)));
             }
+        }
+
+        private string CaminhoSenhas => System.IO.Path.Combine(BaseDrivePath, ".senhas.json");
+
+        [HttpPost]
+        public IActionResult DefinirSenha(string pathAtual, string nomeItem, string senha)
+        {
+            if (TronoBloqueado()) return Unauthorized();
+            
+            var senhasDict = new Dictionary<string, string>();
+            if (System.IO.File.Exists(CaminhoSenhas))
+            {
+                string jsonAtual = System.IO.File.ReadAllText(CaminhoSenhas);
+                senhasDict = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonAtual) ?? new Dictionary<string, string>();
+            }
+
+            // Cria uma chave única baseada no caminho do ficheiro
+            string chave = System.IO.Path.Combine(pathAtual ?? "", nomeItem).Replace("\\", "/");
+
+            if (string.IsNullOrWhiteSpace(senha)) 
+                senhasDict.Remove(chave); // Se enviar em branco, remove a senha
+            else 
+                senhasDict[chave] = senha;
+
+            System.IO.File.WriteAllText(CaminhoSenhas, JsonSerializer.Serialize(senhasDict));
+            return RedirectToAction("Index", new { path = pathAtual });
         }
     }
 }

@@ -38,7 +38,8 @@
 
     <div class="trono-panel" style="padding: 15px;">
         <h4 style="color: var(--offwhite); margin-top:0;">> Forjar Pergaminho</h4>
-        <form asp-action="CriarArquivo" method="post" style="display: flex; gap: 10px;">
+        <!-- Adicionamos o onsubmit para intercetar o envio -->
+        <form id="formForjar" asp-action="CriarArquivo" method="post" onsubmit="forjarSemRecarregar(event)" style="display: flex; gap: 10px;">
             <input type="hidden" name="pathAtual" value="@pathAtual" />
             <input type="text" name="nomeArquivo" class="input-terminal" style="margin:0; padding:5px; flex-grow:1;" placeholder="Nome do arquivo..." required />
             <select name="tipo" class="input-terminal" style="margin:0; padding:2px; height: 32px; border-color: var(--lilas);">
@@ -170,11 +171,15 @@
                             <button type="button" onclick="submitMove('@arquivo', 'sel_move_@objIndex')" style="background: none; border: 1px solid var(--lilas); color: var(--lilas); cursor: pointer; padding: 2px 5px;">[ MOVER ]</button>
 
                             @if (isImagem) { <a target="_blank" href="@Url.Action("ServirArquivo", new { pathAtual = pathAtual, nomeArquivo = arquivo, download = false })" style="color: var(--ciano);">[ VER ]</a> }
-                            @if (isTexto) { <a asp-action="Editar" asp-route-pathAtual="@pathAtual" asp-route-nomeArquivo="@arquivo" style="color: var(--lilas);">[ EDITAR ]</a> }
+                            @if (isTexto) { <a target="_blank" asp-action="Editar" asp-route-pathAtual="@pathAtual" asp-route-nomeArquivo="@arquivo" style="color: var(--lilas);">[ EDITAR ]</a> }
                             @if (isOffice) { <a target="_blank" asp-controller="Office" asp-action="Editor" asp-route-pathAtual="@pathAtual" asp-route-nomeArquivo="@arquivo" style="color: var(--roxo-neon); font-weight: bold;">[ ABRIR DOCS ]</a> }
 
                             <a href="@Url.Action("ServirArquivo", new { pathAtual = pathAtual, nomeArquivo = arquivo, download = true })" style="color: var(--offwhite);">[ DOWN ]</a>
                             <button type="button" onclick="confirmDelete('@arquivo', false)" style="background: none; border: 1px solid var(--vinho); color: var(--vinho); cursor: pointer; padding: 2px 5px;">[ DELETAR ]</button>
+                            <button type="button" onclick="pedirSenha('@arquivo')" style="background: none; border: 1px solid var(--amarelo); color: var(--amarelo); cursor: pointer; padding: 2px 5px;">[ SENHA ]</button>
+                            @if (isOffice) {
+                                <button type="button" onclick="copiarLink('@pathAtual', '@arquivo')" style="background: none; border: 1px solid var(--ciano); color: var(--ciano); cursor: pointer; padding: 2px 5px;">[ COPIAR LINK ]</button>
+                            }
                         </td>
                     </tr>
                 }
@@ -200,6 +205,24 @@
     <input type="hidden" name="destinoItem" id="moveDestinoItem" />
 </form>
 
+<form id="formSenha" asp-action="DefinirSenha" method="post" style="display: none;">
+    <input type="hidden" name="pathAtual" value="@pathAtual" />
+    <input type="hidden" name="nomeItem" id="senhaNomeItem" />
+    <input type="hidden" name="senha" id="senhaValor" />
+</form>
+
+<script>
+    // Função que chama o prompt JavaScript
+    function pedirSenha(nomeItem) {
+        let senhaDigitada = prompt(`Defina uma senha para [ ${nomeItem} ].\nDeixe em branco e clique OK para remover a proteção atual:`);
+        if (senhaDigitada !== null) { // Se não clicou em Cancelar
+            document.getElementById('senhaNomeItem').value = nomeItem;
+            document.getElementById('senhaValor').value = senhaDigitada;
+            document.getElementById('formSenha').submit();
+        }
+    }
+</script>
+
 <div class="trono-panel trono-full-width" style="margin-bottom: 20px;">
     <h4 style="color: var(--lilas); margin-top:0;">> Diário do Mestre / Backlog</h4>
     <form asp-action="SalvarBacklog" method="post" style="display: flex; gap: 10px;">
@@ -210,6 +233,13 @@
 </div>
 
 <script>
+    // === PROTEÇÃO CONTRA FECHAMENTO ACIDENTAL ===
+    let injeccaoEmAndamento = false;
+    window.onbeforeunload = function() {
+        if (injeccaoEmAndamento) {
+            return "A injeção de dados ainda está em andamento. Deseja mesmo abandonar o castelo?";
+        }
+    };
     // 1. Checkboxes em massa
     document.getElementById('checkAll').addEventListener('change', function() {
         const checkboxes = document.querySelectorAll('input[name="itensSelecionados"]');
@@ -240,10 +270,9 @@
         const files2 = Array.from(document.getElementById('uploadDir').files);
         const allFiles = [...files1, ...files2]; 
 
-        if(allFiles.length === 0) {
-            alert('Selecione os ficheiros ou a pasta para injetar no cofre.');
-            return;
-        }
+        if(allFiles.length === 0) return alert('Selecione os ficheiros.');
+
+        injeccaoEmAndamento = true; // <-- ATIVA O BLOQUEIO DA ABA
 
         document.getElementById('progressContainer').style.display = 'block';
         const progressBar = document.getElementById('progressBar');
@@ -323,9 +352,50 @@
         }
 
         // Finalização Glória
+        // No final, quando der 100% (Transferência Concluída):
+        injeccaoEmAndamento = false; // <-- DESATIVA O BLOQUEIO
         progressText.innerText = '100% [Transferência Concluída! Recarregando...]';
         progressBar.style.backgroundColor = "var(--ciano)";
         
         setTimeout(() => window.location.reload(), 1500);
+    }
+    // === CRIAÇÃO DE ARQUIVO SEM RECARREGAR A TELA ===
+    async function forjarSemRecarregar(event) {
+        event.preventDefault(); // Impede a página de recarregar
+        const form = event.target;
+        
+        try {
+            await fetch(form.action, { method: 'POST', body: new FormData(form) });
+            alert('Pergaminho forjado com sucesso! Ele aparecerá aqui quando a página for recarregada.');
+            form.reset(); // Limpa o campo de texto
+        } catch (e) {
+            alert('Erro ao forjar pergaminho.');
+        }
+    }
+    // === 5. GERADOR E COPIADOR DE LINKS MÁGICOS ===
+    function copiarLink(pathAtual, nomeArquivo) {
+        // Pergunta se o Mestre quer incluir a senha no link
+        let senha = prompt(`Gerar link para [ ${nomeArquivo} ]\n\nSe definiu uma senha de edição, digite-a abaixo para incluí-la no link VIP.\nDeixe em branco e prima OK para gerar um link seguro de "Apenas Leitura":`);
+        
+        if (senha === null) return; // Se o utilizador clicar em "Cancelar", não faz nada
+        
+        // Pega automaticamente o domínio atual do Castelo (ex: https://www.stangecastle.com.br)
+        let urlBase = window.location.origin; 
+        
+        // Constrói a base do link com segurança (codificando espaços e acentos)
+        let link = `${urlBase}/Office/Editor?pathAtual=${encodeURIComponent(pathAtual)}&nomeArquivo=${encodeURIComponent(nomeArquivo)}`;
+        
+        // Se o Admin digitou uma senha, anexa-a ao link
+        if (senha.trim() !== "") {
+            link += `&senha=${encodeURIComponent(senha)}`;
+        }
+        
+        // Copia furtivamente para a Área de Transferência (Clipboard)
+        navigator.clipboard.writeText(link).then(() => {
+            alert("🪄 Link mágico forjado e copiado com sucesso para a área de transferência!\n\nAgora é só colar (Ctrl+V) no WhatsApp ou Discord.");
+        }).catch(err => {
+            // Em caso de navegadores antigos ou bloqueios de segurança
+            prompt("O navegador bloqueou a cópia automática. Copie o link abaixo manualmente:", link);
+        });
     }
 </script>

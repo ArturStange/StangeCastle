@@ -40,6 +40,10 @@ services:
     restart: unless-stopped
     environment:
       - JWT_ENABLED=false # Desligamos o JWT nesta primeira fase para facilitar a conexão
+      - ALLOW_PRIVATE_IP_ADDRESS=true # DESBLOQUEIO VITAL: Permite ler documentos da rede interna do Docker
+    dns:
+      - 1.1.1.1 # DNS Cloudflare (Resolve a cegueira)
+      - 8.8.8.8 # DNS Google (Resolve a cegueira)
     networks:
       - homelab_net
       
